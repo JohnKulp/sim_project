@@ -10,12 +10,13 @@ import sys
 
 
 PASSFAIL = True
+dropouts = []
 
 def generate_core_courses(num_core):
 	courses = []
 
 	for i in range(num_core):
-		courses.append(Course(i, class_size = 30))
+		courses.append(Course(i))
 
 	return courses
 
@@ -44,6 +45,20 @@ def update_students_with_new_grades(term):
 			student.add_course(course.classID,grade)
 
 
+def find_leaving_students(students):
+	new_grads_or_dropouts = []
+	for student in students:
+		if completed_core_classes(student):
+			graduates.append(student)
+			new_grads_or_dropouts.append(student)
+		elif student.classes_failed > 15:
+			dropouts.append(student)
+			new_grads_or_dropouts.append(student)
+
+	for student in new_grads_or_dropouts:
+		students.remove(student)
+
+
 def runloop(students, term, num_incoming):
 	new_students = generate_students(num_incoming)
 
@@ -56,9 +71,8 @@ def runloop(students, term, num_incoming):
 
 	update_students_with_new_grades(term)
 
-	find_dropouts(students)
-	find_graduates(students)
-	find_plans_to_retake(students)
+	find_leaving_students(students)
+	find_plans_to_retake(term)
 
 
 
