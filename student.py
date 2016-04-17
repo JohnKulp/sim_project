@@ -39,3 +39,6 @@ class Student():
 	def calculate_GPA(self):
 		self.GPA = np.average(self.courses[1])
 		return self.GPA
+
+	def pass_rate(self):
+		return 1-float(self.classes_failed)/self.classes_taken
