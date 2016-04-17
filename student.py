@@ -40,11 +40,5 @@ class Student():
 		self.GPA = np.average(self.courses[1])
 		return self.GPA
 
-	def finish_semester(self):
-		self.semesters_completed += 1
-
-	def drop_out(self):
-		self.dropped_out = True
-
 	def pass_rate(self):
 		return 1-float(self.classes_failed)/self.classes_taken
