@@ -6,7 +6,7 @@ import student
 import sys
 
 
-def generate_courses(num_core):
+def generate_core_courses(num_core):
 	courses = []
 
 	for i in range(num_core):
@@ -15,8 +15,31 @@ def generate_courses(num_core):
 	return courses
 
 
-def runloop():
-	pass
+def generate_students(num_to_generate):
+	
+	students = []
+
+	for i in range(num_to_generate):
+		students.append(Student(skill_level = random.random()))
+
+
+
+def runloop(students, term, num_incoming):
+	new_students = generate_students(num_incoming)
+
+	#this causes a deep change in the object instead of changing list pointer
+	number_new = len(new_students)
+	for i in range(number_new):
+		students.append(new_students.remove())
+
+	populate_courses_with_students(term, students)
+
+	generate_student_records(term)
+
+	find_dropouts(students)
+	find_graduates(students)
+	find_plans_to_retake(students)
+
 
 
 

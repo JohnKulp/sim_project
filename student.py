@@ -1,39 +1,41 @@
 import numpy as np
+import record.Record
 
 class Student():
 
-	def __init__(self, courses=[], semesters_completed=0, GPA=None, skill_level = 1):
+	def __init__(self, course_transcript={}, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = []):
 		self.GPA = GPA
-		self.courses = courses
+		self.course_transcript = course_transcript
 		self.semesters_completed = semesters_completed
+		self.skill_level = skill_level
+		self.plan_to_retake = plan_to_retake
 
-	def add_course(self, course_ID, grade_received):
-		if course_ID in self.courses[0]:
-			return retake_course(self, course_ID, grade_received)
-
-		self.courses[0].append(course_ID)
-		self.courses[1].append(grade_received)
-
-		self.classes_taken += 1
-
-		if grade_received < 72.5:
+	def add_course_grade(self, course_id, grade):
+		if grade < .7:
 			self.classes_failed += 1
 
-		return True
+		#set self.course_transcript[course_id] to be grade
+		if self.course_transcript.set_default(course_id, grade) != grade:
+			self.course_transcript[course_id] = grade
 
-	def retake_course(self, course_ID, grade_received):
-		self.classes_taken += 1
 
-		for index in range(len(self.courses[0])):
-			if self.courses[0][index] == course_ID:
-				self.courses[1][index] = grade_received
-				calculate_GPA(self)
-				return True
-
-		return False
 
 	def calculate_GPA(self):
-		self.GPA = np.average(self.courses[1])
+		total_grades = 0
+
+		for i in range(self.course_transcript):
+			credit_points = 4
+			if self.course_transcript[i] < .7:
+				credit_points = 1
+			elif self.course_transcript[i] < .8:
+				credit_points = 2
+			elif self.course_transcript[i] < .9:
+				credit_points = 3
+
+
+			total_grades += credit_points
+
+		total_grades /= (len(self.course_transcript) * 4)
 		return self.GPA
 
 	def pass_rate(self):
