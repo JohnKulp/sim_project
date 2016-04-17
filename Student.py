@@ -12,11 +12,11 @@ class Student():
 
 	def add_course_grade(self, course_id, grade):
 		if grade < .7:
-			self.classes_failed.set_default(course_id, 0)
+			self.classes_failed.setdefault(course_id, 0)
 			self.classes_failed[course_id] += 1
 
 		#set self.course_transcript[course_id] to be grade
-		if self.course_transcript.set_default(course_id, grade) != grade:
+		if self.course_transcript.setdefault(course_id, grade) != grade:
 			self.course_transcript[course_id] = grade
 
 
@@ -24,7 +24,7 @@ class Student():
 	def calculate_GPA(self):
 		total_grades = 0
 
-		for i in range(self.course_transcript):
+		for i in range(len(self.course_transcript)):
 			credit_points = 4
 			if self.course_transcript[i] < .7:
 				credit_points = 1
