@@ -1,16 +1,22 @@
-import course
-import faculty
-import record
 import student
+import record
+import faculty
+import course
 
+
+import random
+import scipy.stats as st
 import sys
 
+
+PASSFAIL = True
+dropouts = []
 
 def generate_core_courses(num_core):
 	courses = []
 
 	for i in range(num_core):
-		courses.append(Course(i, class_size = 30))
+		courses.append(Course(i))
 
 	return courses
 
@@ -24,6 +30,35 @@ def generate_students(num_to_generate):
 
 
 
+def grading(difficulty, passfail = True):
+	if passfail:
+		return 1.0 if random.random() >= (1-difficulty) else 0.0
+	else:
+		grade = random.random()
+		return grade if grade >= () (1-difficulty) else 0.0
+
+# a term is a list of courses
+def update_students_with_new_grades(term):
+	for course in term:
+		for student in course.students:
+			grade = grading(course.difficulty, PASSFAIL)
+			student.add_course(course.classID,grade)
+
+
+def find_leaving_students(students):
+	new_grads_or_dropouts = []
+	for student in students:
+		if completed_core_classes(student):
+			graduates.append(student)
+			new_grads_or_dropouts.append(student)
+		elif student.classes_failed > 15:
+			dropouts.append(student)
+			new_grads_or_dropouts.append(student)
+
+	for student in new_grads_or_dropouts:
+		students.remove(student)
+
+
 def runloop(students, term, num_incoming):
 	new_students = generate_students(num_incoming)
 
@@ -34,11 +69,10 @@ def runloop(students, term, num_incoming):
 
 	populate_courses_with_students(term, students)
 
-	generate_student_records(term)
+	update_students_with_new_grades(term)
 
-	find_dropouts(students)
-	find_graduates(students)
-	find_plans_to_retake(students)
+	find_leaving_students(students)
+	find_plans_to_retake(term)
 
 
 

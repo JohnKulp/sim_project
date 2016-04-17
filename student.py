@@ -3,16 +3,18 @@ import record.Record
 
 class Student():
 
-	def __init__(self, course_transcript={}, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = []):
+	def __init__(self, course_transcript={}, classes_failed = {}, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = []):
 		self.GPA = GPA
 		self.course_transcript = course_transcript
 		self.semesters_completed = semesters_completed
+		self.classes_failed = classes_failed
 		self.skill_level = skill_level
 		self.plan_to_retake = plan_to_retake
 
 	def add_course_grade(self, course_id, grade):
 		if grade < .7:
-			self.classes_failed += 1
+			self.classes_failed.set_default(course_id, 0)
+			self.classes_failed[course_id] += 1
 
 		#set self.course_transcript[course_id] to be grade
 		if self.course_transcript.set_default(course_id, grade) != grade:
