@@ -6,10 +6,7 @@ class Student():
 		self.ID = ID
 		self.GPA = GPA
 		self.courses = courses
-		self.classes_taken = classes_taken
-		self.classes_failed = classes_failed
 		self.semesters_completed = semesters_completed
-		self.dropped_out = dropped_out
 
 	def add_course(self, course_ID, grade_received):
 		if course_ID in self.courses[0]:
