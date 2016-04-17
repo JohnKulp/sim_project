@@ -28,12 +28,6 @@ def generate_students(num_to_generate):
 		students.append(Student(skill_level = random.random()))
 
 
-# a term is a list of courses
-def term_occur(term):
-	for course in term:
-		for student in course.students:
-			grade = grading(course.difficulty, PASSFAIL)
-			student.add_course(course.classID,grade)
 
 def grading(difficulty, passfail = True):
 	if passfail:
@@ -41,6 +35,13 @@ def grading(difficulty, passfail = True):
 	else:
 		grade = random.random()
 		return grade if grade >= () (1-difficulty) else 0.0
+
+# a term is a list of courses
+def update_students_with_new_grades(term):
+	for course in term:
+		for student in course.students:
+			grade = grading(course.difficulty, PASSFAIL)
+			student.add_course(course.classID,grade)
 
 
 def runloop(students, term, num_incoming):
@@ -53,7 +54,7 @@ def runloop(students, term, num_incoming):
 
 	populate_courses_with_students(term, students)
 
-	generate_student_records(term)
+	update_students_with_new_grades(term)
 
 	find_dropouts(students)
 	find_graduates(students)
