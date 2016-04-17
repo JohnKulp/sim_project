@@ -2,7 +2,7 @@ import numpy as np
 
 class Student():
 
-	def __init__(self, courses=[], semesters_completed=0, GPA=None, ):
+	def __init__(self, courses=[], semesters_completed=0, GPA=None, skill_level = 1):
 		self.GPA = GPA
 		self.courses = courses
 		self.semesters_completed = semesters_completed
