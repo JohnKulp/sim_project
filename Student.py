@@ -47,3 +47,4 @@ class Student():
 
 	def pass_rate(self):
 		return 1 - float(self.classes_failed) / self.classes_taken
+

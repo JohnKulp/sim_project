@@ -1,6 +1,6 @@
-from Student import Student
-from Faculty import Faculty
-from Course import Course
+from Student import *
+from Faculty import *
+from Course import *
 
 import operator
 import random
@@ -11,7 +11,6 @@ global student_id_inc
 global passfail
 global dropouts
 global graduates 
-global verbose
 global core_classes
 
 #electives globals
@@ -79,12 +78,28 @@ def generate_students(num_to_generate):
 
 
 
-def assignGradeToStudent(difficulty, passfail = True):
-	if passfail:
-		return 1.0 if random.random() >= (difficulty) else 0.0
-	else:
-		grade = random.random()
-		return grade if grade >= () (difficulty) else 0.0
+def find_leaving_students(students):
+	global graduates
+	global dropouts
+
+	new_grads_or_dropouts = []
+
+	dropout_chance = random.random()
+
+	for student in students:
+		#print("the length of this student's transcript is {}.".format(len(student.course_transcript)))
+			
+		if completed_core_classes(student):
+			graduates.append(student)
+			new_grads_or_dropouts.append(student)
+		elif len(student.classes_failed) > 10 or dropout_chance < .02:#or completed exactly half the core courses and 50%
+			dropouts.append(student)
+			new_grads_or_dropouts.append(student)
+
+
+	for student in new_grads_or_dropouts:
+		students.remove(student)
+
 
 # a term is a list of courses
 def update_students_with_new_grades(term):
@@ -98,6 +113,27 @@ def update_students_with_new_grades(term):
 			student.add_course_grade(course.course_id,grade)
 
 
+def assignGradeToStudent(difficulty, passfail = True):
+	if passfail:
+		return 1.0 if random.random() >= (difficulty) else 0.0
+	else:
+		grade = random.random()
+		return grade if grade >= () (difficulty) else 0.0
+
+
+# term is a list of courses for the semester
+def find_plans_to_retake(term):
+	for course in term:
+		for student in course.students:
+			# this key should exist by the time this is called
+			if student.course_transcript[course.course_id] == 0:
+				student.plan_to_retake.append(course.course_id)
+
+def completed_core_classes(student):
+	return len(student.course_transcript) >= 20
+
+
+
 def sort_students(student1, student2):
 	credits1 = len(student1.course_transcript)
 	credits2 = len(student2.course_transcript)
@@ -107,6 +143,10 @@ def sort_students(student1, student2):
 		return 0
 	else:
 		return 1
+
+def remove_students_from_courses(term):
+	for course in term:
+		course.students = []
 
 def populate_courses_with_students(term,students):
 	students.sort(key = lambda x: len(x.course_transcript), reverse=True)
@@ -149,40 +189,6 @@ def populate_courses_with_students(term,students):
 		if verbose:
 			print("a student registered for classes {}".format(courses_taken))
 
-def completed_core_classes(student):
-	return len(student.course_transcript) >= 20
-
-def find_leaving_students(students):
-	global graduates
-	global dropouts
-
-	new_grads_or_dropouts = []
-	for student in students:
-		#print("the length of this student's transcript is {}.".format(len(student.course_transcript)))
-			
-		if completed_core_classes(student):
-			graduates.append(student)
-			new_grads_or_dropouts.append(student)
-		elif len(student.classes_failed) > 10 or random.random() < .02:
-			dropouts.append(student)
-			new_grads_or_dropouts.append(student)
-
-	for student in new_grads_or_dropouts:
-		students.remove(student)
-
-
-# term is a list of courses for the semester
-def find_plans_to_retake(term):
-	for course in term:
-		for student in course.students:
-			# this key should exist by the time this is called
-			if student.course_transcript[course.course_id] == 0:
-				student.plan_to_retake.append(course.course_id)
-
-
-def remove_students_from_courses(term):
-	for course in term:
-		course.students = []
 
 def runloop(students, term, num_incoming):
 	global verbose
@@ -215,7 +221,6 @@ if __name__ == "__main__":
 	global dropouts
 	global graduates
 	global student_id_inc
-	global verbose
 	global core_classes
 
 	global electives_bag

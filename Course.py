@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import random
 
 class Course():
 
@@ -14,3 +15,4 @@ class Course():
 		self.is_core = is_core
 		requirements = [] if requirements == None else requirements
 		self.requirements = requirements
+
