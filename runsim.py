@@ -14,24 +14,55 @@ global graduates
 global verbose
 global core_classes
 
+#electives globals
+global elective_bag
+global electives_inc
+
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
-	global core_classes
-
+	
 	courses = []
 
-	for i in range(num_core):
-		courses.append(Course(i, students = []))
+	cs401 = Course(401)
+	cs441 = Course(441)
+	cs445 = Course(445, requirements=[401])
+	cs447 = Course(447, requirements=[445])
+	cs449 = Course(449, requirements=[447])
+	cs1501 = Course(1501, requirements=[401, 445])
+	cs1502 = Course(1502, requirements=[441, 445])
+	cs1550 = Course(1550, requirements=[447, 449])
+
+	courses.append(cs401)
+	courses.append(cs441)
+	courses.append(cs445)
+	courses.append(cs447)
+	courses.append(cs449)
+	courses.append(cs1501)
+	courses.append(cs1502)
+	courses.append(cs1550)
 
 	return courses
 
-#15 electives
-def generate_electives(num_core):
+#14 electives
+def generate_electives(number_of_electives):
+	global electives_bag
+	global electives_inc
 
 	courses = []
+	if len(electives_bag) < number_of_electives:
+		#add new electives
+		for i in range(number_of_electives - len(electives_bag)):
+			electives_bag.append(Course(i, requirements = 445, is_core = False))
+			electives_inc += 1
 
-	for i in range(num_core):
-		courses.append(Course(i, students = []))
+	#pick from a deep copy of the bag
+	bag_copy = electives_bag[:]
+	random.shuffle(bag_copy)
+
+	for i in range(number_of_electives):
+		courses.append(bag_copy.pop())
+	return courses
+
 
 	return courses
 
@@ -149,6 +180,9 @@ def find_plans_to_retake(term):
 				student.plan_to_retake.append(course.course_id)
 
 
+def remove_students_from_courses(term):
+	for course in term:
+		course.students = []
 
 def runloop(students, term, num_incoming):
 	global verbose
@@ -170,6 +204,7 @@ def runloop(students, term, num_incoming):
 
 	find_leaving_students(students)
 	find_plans_to_retake(term)
+	remove_students_from_courses(term)
 
 	return students
 
@@ -182,6 +217,12 @@ if __name__ == "__main__":
 	global student_id_inc
 	global verbose
 	global core_classes
+
+	global electives_bag
+	global electives_inc
+
+	electives_bag = []
+	electives_inc = 0
 
 	core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
 
@@ -203,10 +244,10 @@ if __name__ == "__main__":
 		num_iterations = int(sys.argv[1])
 
 		students = []
+		courses = generate_core_courses(30)
+		courses += generate_electives(14)
 
 		for i in range(num_iterations):
-			courses = generate_core_courses(30)
-			courses += generate_electives(15)
 			students = runloop(students, courses, 5)
 
 		print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
