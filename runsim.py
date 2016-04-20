@@ -17,7 +17,7 @@ def generate_core_courses(num_core):
 	courses = []
 
 	for i in range(num_core):
-		courses.append(Course(i))
+		courses.append(Course(i, students = []))
 
 	return courses
 
