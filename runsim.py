@@ -120,7 +120,7 @@ def find_leaving_students(students):
 		if completed_core_classes(student):
 			graduates.append(student)
 			new_grads_or_dropouts.append(student)
-		elif len(student.classes_failed) > 15:
+		elif len(student.classes_failed) > 10 or random.random() < .02:
 			dropouts.append(student)
 			new_grads_or_dropouts.append(student)
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
 		for i in range(num_iterations):
 			courses = generate_core_courses(20)
-			students += runloop(students, courses, 5)
+			students = runloop(students, courses, 5)
 
 		print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
 		print("{} students were still in the system.".format(len(students)))
@@ -200,3 +200,23 @@ if __name__ == "__main__":
 			if len(graduates)>=i:
 				break
 			print(graduates[i].calculate_GPA())
+
+		student_ids = []
+		for student in students:
+			student_ids.append(student.student_id)
+
+		grad_ids = []
+		for graduate in graduates:
+			grad_ids.append(graduate.student_id)
+
+		dropout_ids = []
+		for dropout in dropouts:
+			dropout_ids.append(dropout.student_id)
+
+		student_ids.sort()
+		grad_ids.sort()
+		dropout_ids.sort()
+
+		print("students at end of sim: {}".format(student_ids))
+		print("graduates at end of sim: {}".format(grad_ids))
+		print("dropouts at end of sim: {}".format(dropout_ids))
