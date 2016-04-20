@@ -69,10 +69,11 @@ def populate_courses_with_students(term,students):
 	students.sort(key = lambda x: len(x.course_transcript), reverse=True)
 	for student in students:
 		courses_taken=[]
+		max_courses = 2 + (1 if random.random() < student.skill_level else 0)
 		#try to retake courses the student plans to retake first
 		for course_id in student.plan_to_retake:
 			for i in range(len(term)):
-				if course_id == term[i].course_id and len(courses_taken <= 3):
+				if course_id == term[i].course_id and len(courses_taken <= max_courses):
 					#if there is space left in the class, take it
 					if term[i].class_size>len(term[i].students):
 						courses_taken.append(course_id)
@@ -85,7 +86,7 @@ def populate_courses_with_students(term,students):
 
 		random.shuffle(term)
 		for course in term:
-			if len(courses_taken) >= 3:
+			if len(courses_taken) >= max_courses:
 				break
 
 			if verbose:
