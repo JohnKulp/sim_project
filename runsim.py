@@ -12,8 +12,11 @@ global passfail
 global dropouts
 global graduates 
 global verbose
+global core_classes
 
+#9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
+	global core_classes
 
 	courses = []
 
@@ -22,6 +25,15 @@ def generate_core_courses(num_core):
 
 	return courses
 
+#15 electives
+def generate_electives(num_core):
+
+	courses = []
+
+	for i in range(num_core):
+		courses.append(Course(i, students = []))
+
+	return courses
 
 def generate_students(num_to_generate):
 	global student_id_inc
@@ -162,7 +174,6 @@ def runloop(students, term, num_incoming):
 	return students
 
 
-
 if __name__ == "__main__":
 
 	global passfail
@@ -170,6 +181,10 @@ if __name__ == "__main__":
 	global graduates
 	global student_id_inc
 	global verbose
+	global core_classes
+
+	core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
+
 
 	passfail = True
 	dropouts = []
@@ -190,7 +205,8 @@ if __name__ == "__main__":
 		students = []
 
 		for i in range(num_iterations):
-			courses = generate_core_courses(20)
+			courses = generate_core_courses(30)
+			courses += generate_electives(15)
 			students = runloop(students, courses, 5)
 
 		print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
