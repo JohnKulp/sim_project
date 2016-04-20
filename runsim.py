@@ -11,6 +11,7 @@ global student_id_inc
 global passfail
 global dropouts
 global graduates 
+global verbose
 
 def generate_core_courses(num_core):
 
@@ -46,8 +47,9 @@ def assignGradeToStudent(difficulty, passfail = True):
 def update_students_with_new_grades(term):
 	global passfail
 	for course in term:
-		print("at the end of the semester, course {} had {} students out of {}".format(
-			course.course_id, len(course.students), course.class_size))
+		if verbose:
+			print("at the end of the semester, course {} had {} students out of {}".format(
+				course.course_id, len(course.students), course.class_size))
 		for student in course.students:
 			grade = assignGradeToStudent(course.difficulty, passfail)
 			student.add_course_grade(course.course_id,grade)
@@ -86,17 +88,22 @@ def populate_courses_with_students(term,students):
 			if len(courses_taken) >= 3:
 				break
 
-			print("looking to add student {} to course {}".format(student.student_id, course.course_id))
+			if verbose:
+				print("looking to add student {} to course {}".format(student.student_id, course.course_id))
+			
 			if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
 					and course.class_size>=len(course.students):
 
-				print("course {} has {} students in it before adding a student".format(course.course_id, len(course.students)))
-				print("adding student {} to course {}".format(student.student_id, course.course_id))
+				if verbose:
+					print("course {} has {} students in it before adding a student".format(course.course_id, len(course.students)))
+					print("adding student {} to course {}".format(student.student_id, course.course_id))
 
 				courses_taken.append(course.course_id)
 				course.students.append(student)
-				print("course {} has {} students in it after adding a student".format(course.course_id, len(course.students)))
-		print("a student registered for classes {}".format(courses_taken))
+				if verbose:
+					print("course {} has {} students in it after adding a student".format(course.course_id, len(course.students)))
+		if verbose:
+			print("a student registered for classes {}".format(courses_taken))
 
 def completed_core_classes(student):
 	return len(student.course_transcript) >= 20
@@ -131,7 +138,10 @@ def find_plans_to_retake(term):
 
 
 def runloop(students, term, num_incoming):
-	print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
+	global verbose
+
+	if verbose:
+		print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
 	new_students = generate_students(num_incoming)
 
 	#this causes a deep change in the object instead of changing list pointer
@@ -140,7 +150,8 @@ def runloop(students, term, num_incoming):
 		students.append(new_students.pop())
 
 	populate_courses_with_students(term, students)
-	print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
+	if verbose:
+		print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
 	
 	update_students_with_new_grades(term)
 
@@ -157,17 +168,21 @@ if __name__ == "__main__":
 	global dropouts
 	global graduates
 	global student_id_inc
+	global verbose
 
 	passfail = True
 	dropouts = []
 	graduates = []
 	student_id_inc = 0
 
-	if len(sys.argv) != 2:
-		print("run with number of iterations as the only argument")
-		
+	if len(sys.argv) <2 or len(sys.argv) > 3:
+		print("run with number of iterations as an argument")
 	else:
 
+		if len(sys.argv) == 3:
+			verbose = True
+		else:
+			verbose = False
 
 		num_iterations = int(sys.argv[1])
 
@@ -175,7 +190,6 @@ if __name__ == "__main__":
 
 		for i in range(num_iterations):
 			courses = generate_core_courses(20)
-			print (courses[3].students)
 			students += runloop(students, courses, 5)
 
 		print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
