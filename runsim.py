@@ -92,7 +92,8 @@ def find_leaving_students(students):
 		if completed_core_classes(student):
 			graduates.append(student)
 			new_grads_or_dropouts.append(student)
-		elif len(student.classes_failed) > 10 or dropout_chance < .02:#or completed exactly half the core courses and 50%
+
+		elif len(student.classes_failed) > 10 or dropout_chance < .02 or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
 			dropouts.append(student)
 			new_grads_or_dropouts.append(student)
 
@@ -211,6 +212,8 @@ def runloop(students, term, num_incoming):
 	find_leaving_students(students)
 	find_plans_to_retake(term)
 	remove_students_from_courses(term)
+	for student in students:
+		student.semesters_completed +=1
 
 	return students
 
@@ -253,7 +256,7 @@ if __name__ == "__main__":
 		courses += generate_electives(14)
 
 		for i in range(num_iterations):
-			students = runloop(students, courses, 5)
+			students = runloop(students, courses, 100)
 
 		print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
 		print("{} students were still in the system.".format(len(students)))
