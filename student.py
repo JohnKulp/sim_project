@@ -2,7 +2,8 @@ import numpy as np
 
 class Student():
 
-	def __init__(self, course_transcript={}, classes_failed = {}, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = []):
+	def __init__(self, course_transcript={}, classes_failed = {}, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = [], student_id = 0):
+		self.student_id = student_id #for printing purposes
 		self.GPA = GPA
 		self.course_transcript = course_transcript
 		self.semesters_completed = semesters_completed
@@ -23,6 +24,8 @@ class Student():
 
 	def calculate_GPA(self):
 		total_grades = 0
+		if len(self.course_transcript) is 0:
+			return None
 
 		for i in range(len(self.course_transcript)):
 			credit_points = 4
