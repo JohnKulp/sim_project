@@ -90,10 +90,12 @@ def populate_courses_with_students(term,students):
 			if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
 					and course.class_size>=len(course.students):
 
+				print("course {} has {} students in it before adding a student".format(course.course_id, len(course.students)))
 				print("adding student {} to course {}".format(student.student_id, course.course_id))
 
 				courses_taken.append(course.course_id)
 				course.students.append(student)
+				print("course {} has {} students in it after adding a student".format(course.course_id, len(course.students)))
 		print("a student registered for classes {}".format(courses_taken))
 
 def completed_core_classes(student):
