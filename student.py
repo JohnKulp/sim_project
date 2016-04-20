@@ -43,4 +43,4 @@ class Student():
 		return self.GPA
 
 	def pass_rate(self):
-		return 1-float(self.classes_failed)/self.classes_taken
+		return 1 - float(self.classes_failed) / self.classes_taken
