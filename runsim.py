@@ -29,21 +29,21 @@ def calculate_class_sizes(num_sections):
 
     for each_class in core_classes:
         level_of_interest = len(each_class.students) + len(each_class.waitlist)
-        each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 20
+        each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 40
 
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .1, class_size = 6*20)
-    cs441 = Course(441, difficulty = .05, class_size = 3*20)
-    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 3*20)
-    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 3*20)
-    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 3*20)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 8*20)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 2*20)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*20)
+    cs401 = Course(401, difficulty = .05, class_size = 7*40)
+    cs441 = Course(441, difficulty = .025, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = .075, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .075, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .05, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .1, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .05, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .125, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -67,7 +67,7 @@ def generate_electives(number_of_electives):
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
             requirement = [445] if random.random() < .2 else [1501]
-            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15))
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -236,8 +236,6 @@ def populate_courses_with_students(term,students):
 def runloop(students, term, num_incoming):
     global verbose
 
-    if verbose:
-        print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
     new_students = generate_students(num_incoming)
 
     #this causes a deep change in the object instead of changing list pointer
@@ -247,17 +245,20 @@ def runloop(students, term, num_incoming):
 
     populate_courses_with_students(term, students)
     if verbose:
-        print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
+        print ("{}, size: {}, students: {}, term: {}, waitlist: {}".format(term[2].course_id, term[2].class_size, len(term[2].students), term[2].term, term[2].waitlist))
     
     update_students_with_new_grades(term)
 
+
     find_leaving_students(students)
     find_plans_to_retake(term)
-    courses.sort(key=lambda x: x.course_id)
 
+    courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
     for student in students:
         student.semesters_completed +=1
+
+
     return students
 
 
@@ -299,8 +300,9 @@ if __name__ == "__main__":
         courses = generate_electives(14) + core_classes
 
         for i in range(num_iterations):
-            #print("\n\nsemester {}".format(i))
-            students = runloop(students, courses, 100)
+            if verbose:
+                print("\n\nsemester {}".format(i))
+            students = runloop(students, courses, 275)
 
         print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
         print("{} students were still in the system.".format(len(students)))
