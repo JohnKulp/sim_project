@@ -20,22 +20,29 @@ global electives_inc
 
 #distribution will be a dictionary of class num to a modifying value:
 #e.g. [401: 4.15, 441:3.2, 1501:3, 445: 5.38 , ...]
-def calculate_class_size(core_classes, distribution):
-    pass
+def calculate_class_size(core_classes, num_sections):
+
+    total = 0
+    for each_class in core_classes:
+        total += len(each_class.students) + each_class.waitlist
+
+    for each_class in core_classes:
+        level_of_interest = len(each_class.students) + each_class.waitlist
+        each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 20
 
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .1)
-    cs441 = Course(441, difficulty = .05)
-    cs445 = Course(445, requirements=[401], difficulty = .15)
-    cs447 = Course(447, requirements=[445], difficulty = .15)
-    cs449 = Course(449, requirements=[447], difficulty = .1)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25)
+    cs401 = Course(401, difficulty = .1, class_size = 6*20)
+    cs441 = Course(441, difficulty = .05, class_size = 3*20)
+    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 3*20)
+    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 3*20)
+    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 3*20)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 8*20)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 2*20)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*20)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -58,7 +65,8 @@ def generate_electives(number_of_electives):
     if len(electives_bag) < number_of_electives:
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
-            electives_bag.append(Course(i, requirements = 445, is_core = False, difficulty = .15))
+            requirement = [445] if random.random() < .2 else [1501]
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -124,7 +132,7 @@ def assign_grade_to_student(difficulty, passfail = True):
         return 1.0 if random.random() >= (difficulty) else 0.0
     else:
         grade = random.random()
-        return grade if grade >= () (difficulty) else 0.0
+        return grade if grade >= 1 - difficulty else 0.0
 
 
 # term is a list of courses for the semester
