@@ -1,0 +1,179 @@
+iteration 1
+students at end of sim: 1235
+graduates at end of sim: 7963
+dropouts at end of sim: 1008
+minors at the end of sim: 17294
+number dropped out for failing classes: 0
+number naturally droppout out: 1006
+number dropped out for being in system too long: 2
+
+iteration 2
+students at end of sim: 1194
+graduates at end of sim: 7938
+dropouts at end of sim: 1038
+minors at the end of sim: 17330
+number dropped out for failing classes: 0
+number naturally droppout out: 1031
+number dropped out for being in system too long: 8
+
+iteration 3
+students at end of sim: 1166
+graduates at end of sim: 7925
+dropouts at end of sim: 1038
+minors at the end of sim: 17371
+number dropped out for failing classes: 0
+number naturally droppout out: 1038
+number dropped out for being in system too long: 0
+
+iteration 4
+students at end of sim: 1217
+graduates at end of sim: 7939
+dropouts at end of sim: 1016
+minors at the end of sim: 17328
+number dropped out for failing classes: 0
+number naturally droppout out: 1016
+number dropped out for being in system too long: 0
+
+iteration 5
+students at end of sim: 1199
+graduates at end of sim: 7955
+dropouts at end of sim: 1002
+minors at the end of sim: 17344
+number dropped out for failing classes: 0
+number naturally droppout out: 1001
+number dropped out for being in system too long: 1
+
+iteration 6
+students at end of sim: 1281
+graduates at end of sim: 7978
+dropouts at end of sim: 1027
+minors at the end of sim: 17214
+number dropped out for failing classes: 0
+number naturally droppout out: 1024
+number dropped out for being in system too long: 3
+
+iteration 7
+students at end of sim: 1206
+graduates at end of sim: 7959
+dropouts at end of sim: 1025
+minors at the end of sim: 17310
+number dropped out for failing classes: 0
+number naturally droppout out: 1024
+number dropped out for being in system too long: 1
+
+iteration 8
+students at end of sim: 1107
+graduates at end of sim: 7966
+dropouts at end of sim: 975
+minors at the end of sim: 17452
+number dropped out for failing classes: 0
+number naturally droppout out: 975
+number dropped out for being in system too long: 0
+
+iteration 9
+students at end of sim: 1218
+graduates at end of sim: 7957
+dropouts at end of sim: 1070
+minors at the end of sim: 17255
+number dropped out for failing classes: 0
+number naturally droppout out: 1069
+number dropped out for being in system too long: 1
+
+iteration 10
+students at end of sim: 1114
+graduates at end of sim: 7991
+dropouts at end of sim: 1006
+minors at the end of sim: 17389
+number dropped out for failing classes: 0
+number naturally droppout out: 1006
+number dropped out for being in system too long: 0
+
+iteration 11
+students at end of sim: 1295
+graduates at end of sim: 8000
+dropouts at end of sim: 998
+minors at the end of sim: 17207
+number dropped out for failing classes: 0
+number naturally droppout out: 992
+number dropped out for being in system too long: 6
+
+iteration 12
+students at end of sim: 1155
+graduates at end of sim: 7939
+dropouts at end of sim: 973
+minors at the end of sim: 17433
+number dropped out for failing classes: 0
+number naturally droppout out: 973
+number dropped out for being in system too long: 0
+
+iteration 13
+students at end of sim: 1234
+graduates at end of sim: 7961
+dropouts at end of sim: 1025
+minors at the end of sim: 17280
+number dropped out for failing classes: 0
+number naturally droppout out: 1023
+number dropped out for being in system too long: 2
+
+iteration 14
+students at end of sim: 1232
+graduates at end of sim: 8002
+dropouts at end of sim: 957
+minors at the end of sim: 17309
+number dropped out for failing classes: 0
+number naturally droppout out: 957
+number dropped out for being in system too long: 0
+
+iteration 15
+students at end of sim: 1190
+graduates at end of sim: 7993
+dropouts at end of sim: 974
+minors at the end of sim: 17343
+number dropped out for failing classes: 0
+number naturally droppout out: 973
+number dropped out for being in system too long: 1
+
+iteration 16
+students at end of sim: 1271
+graduates at end of sim: 7982
+dropouts at end of sim: 1081
+minors at the end of sim: 17166
+number dropped out for failing classes: 0
+number naturally droppout out: 1073
+number dropped out for being in system too long: 8
+
+iteration 17
+students at end of sim: 1234
+graduates at end of sim: 7954
+dropouts at end of sim: 981
+minors at the end of sim: 17331
+number dropped out for failing classes: 0
+number naturally droppout out: 980
+number dropped out for being in system too long: 1
+
+iteration 18
+students at end of sim: 1268
+graduates at end of sim: 7918
+dropouts at end of sim: 1107
+minors at the end of sim: 17207
+number dropped out for failing classes: 0
+number naturally droppout out: 1105
+number dropped out for being in system too long: 2
+
+iteration 19
+students at end of sim: 1252
+graduates at end of sim: 7945
+dropouts at end of sim: 1035
+minors at the end of sim: 17268
+number dropped out for failing classes: 0
+number naturally droppout out: 1031
+number dropped out for being in system too long: 4
+
+iteration 20
+students at end of sim: 1121
+graduates at end of sim: 7938
+dropouts at end of sim: 1007
+minors at the end of sim: 17434
+number dropped out for failing classes: 0
+number naturally droppout out: 1005
+number dropped out for being in system too long: 2
