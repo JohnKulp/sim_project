@@ -219,7 +219,7 @@ def populate_courses_with_students(term,students):
                 break
 
             if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size >= len(course.students):
+                    and course.class_size > len(course.students):
                 courses_taken.append(course.course_id)
                 course.students.append(student)
 
@@ -228,7 +228,7 @@ def populate_courses_with_students(term,students):
                 break
 
             if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size>=len(course.students):
+                    and course.class_size > len(course.students):
                 courses_taken.append(course.course_id)
                 course.students.append(student)
 
@@ -273,19 +273,9 @@ if __name__ == "__main__":
     global electives_bag
     global electives_inc
 
-    electives_bag = []
-    electives_inc = 0
 
-    core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
-
-
-    passfail = True
-    dropouts = []
-    graduates = []
-    student_id_inc = 0
-
-    if len(sys.argv) <2 or len(sys.argv) > 3:
-        print("run with number of iterations as an argument")
+    if len(sys.argv) <3 or len(sys.argv) > 4:
+        print("run with number of terms and number of iterations to run that many terms as an argument")
     else:
 
         if len(sys.argv) == 3:
@@ -293,24 +283,42 @@ if __name__ == "__main__":
         else:
             verbose = False
 
-        num_iterations = int(sys.argv[1])
+        num_terms = int(sys.argv[1])
+        num_iterations = int(sys.argv[2])
 
-        students = []
-        core_classes = generate_core_courses(30)
-        courses = generate_electives(14) + core_classes
 
         for i in range(num_iterations):
-            if verbose:
-                print("\n\nsemester {}".format(i))
-            students = runloop(students, courses, 275)
 
-        print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
-        print("{} students were still in the system.".format(len(students)))
-        print("some sample GPAs were: ")
-        for i in range(10):
-            if len(graduates)>=i:
-                break
-            print(graduates[i].calculate_GPA())
+            #set term variables
+
+            electives_bag = []
+            electives_inc = 0
+
+            core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
+
+
+            passfail = True
+            dropouts = []
+            graduates = []
+            student_id_inc = 0
+
+
+            students = []
+            core_classes = generate_core_courses(30)
+            courses = generate_electives(14) + core_classes
+
+            for z in range(num_terms):
+                if verbose:
+                    print("\n\nsemester {}".format(z))
+                students = runloop(students, courses, 275)
+
+            print("at the end of simulation {}, there were {} dropouts and {} graduates".format(i, len(dropouts), len(graduates)))
+            print("{} students were still in the system.".format(len(students)))
+            print("some sample GPAs were: ")
+            for i in range(10):
+                if len(graduates)>=i:
+                    break
+                print(graduates[i].calculate_GPA())
 
         student_ids = []
         for student in students:
