@@ -63,9 +63,6 @@ def generate_electives(number_of_electives):
         courses.append(bag_copy.pop())
     return courses
 
-
-    return courses
-
 def generate_students(num_to_generate):
     global student_id_inc
     
@@ -85,7 +82,7 @@ def find_leaving_students(students):
 
     new_grads_or_dropouts = []
 
-    dropout_chance = random.random()
+    dropout_chance = random.random() < .01
 
     for student in students:
         #print("the length of this student's transcript is {}.".format(len(student.course_transcript)))
@@ -94,7 +91,7 @@ def find_leaving_students(students):
             graduates.append(student)
             new_grads_or_dropouts.append(student)
 
-        elif len(student.classes_failed) > 10 or dropout_chance < .01 or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
+        elif len(student.classes_failed) > 10 or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
             dropouts.append(student)
             new_grads_or_dropouts.append(student)
 
@@ -111,11 +108,11 @@ def update_students_with_new_grades(term):
             print("at the end of the semester, course {} had {} students out of {}".format(
                 course.course_id, len(course.students), course.class_size))
         for student in course.students:
-            grade = assignGradeToStudent(course.difficulty, passfail)
+            grade = assign_grade_to_student(course.difficulty, passfail)
             student.add_course_grade(course.course_id,grade)
 
 
-def assignGradeToStudent(difficulty, passfail = True):
+def assign_grade_to_student(difficulty, passfail = True):
     if passfail:
         return 1.0 if random.random() >= (difficulty) else 0.0
     else:
@@ -128,7 +125,7 @@ def find_plans_to_retake(term):
     for course in term:
         for student in course.students:
             # this key should exist by the time this is called
-            if student.course_transcript[course.course_id] == 0:
+            if student.course_transcript[course.course_id] == 0 and course.course_id not in student.plan_to_retake:
                 student.plan_to_retake.append(course.course_id)
 
 
@@ -137,14 +134,13 @@ def find_plans_to_retake(term):
 def completed_core_classes(student):
     global core_classes
 
-    passed_classes = list(student.course_transcript)
+    passed_classes = [x for x, grade in student.course_transcript.iteritems() if grade >= .7]
 
-    required = [x for x in core_classes]
+    required = [x.course_id for x in core_classes]
 
-    completed_core = all(x in passed_classes and student.course_transcript[x] >= .7 for x in required)
-    if completed_core:
-        print("finished core classes! Yay!")
-    completed_electives = [x for x in passed_classes if x not in required and student.course_transcript[x] >= .7]
+    completed_core = all(x in passed_classes for x in required)
+
+    completed_electives = [x for x in passed_classes if x not in required]
 
     return completed_core and len(completed_electives) > 4
 
