@@ -82,16 +82,17 @@ def find_leaving_students(students):
 
     new_grads_or_dropouts = []
 
-    dropout_chance = random.random() < .01
 
     for student in students:
-        #print("the length of this student's transcript is {}.".format(len(student.course_transcript)))
-            
+        dropout_chance = random.random() < .01
+
         if completed_core_classes(student):
             graduates.append(student)
             new_grads_or_dropouts.append(student)
 
         elif len(student.classes_failed) > 10 or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
+            #print("someone is leaving.  They failed {} classes, the dropout chance was {}, and the semesters completed was {}".format(
+            #    student.classes_failed, dropout_chance, student.semesters_completed))
             dropouts.append(student)
             new_grads_or_dropouts.append(student)
 
