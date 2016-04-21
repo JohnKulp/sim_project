@@ -38,14 +38,14 @@ def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .05, class_size = 7*40)
-    cs441 = Course(441, difficulty = .025, class_size = 6*40)
-    cs445 = Course(445, requirements=[401], difficulty = .075, class_size = 5*40)
-    cs447 = Course(447, requirements=[445], difficulty = .075, class_size = 5*40)
-    cs449 = Course(449, requirements=[447], difficulty = .05, class_size = 4*40)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .1, class_size = 4*40)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .05, class_size = 3*40)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .125, class_size = 2*40)
+    cs401 = Course(401, difficulty = .1, class_size = 7*40)
+    cs441 = Course(441, difficulty = .05, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -69,7 +69,7 @@ def generate_electives(number_of_electives):
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
             requirement = [445] if random.random() < .2 else [1501]
-            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .05, class_size = 40))
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -86,7 +86,7 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .5))
+        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .35))
         student_id_inc +=1
 
     return students
