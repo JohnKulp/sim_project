@@ -20,14 +20,15 @@ global electives_inc
 
 #distribution will be a dictionary of class num to a modifying value:
 #e.g. [401: 4.15, 441:3.2, 1501:3, 445: 5.38 , ...]
-def calculate_class_size(core_classes, num_sections):
+def calculate_class_sizes(num_sections):
+    global core_classes
 
     total = 0
     for each_class in core_classes:
         total += len(each_class.students) + each_class.waitlist
 
     for each_class in core_classes:
-        level_of_interest = len(each_class.students) + each_class.waitlist
+        level_of_interest = len(each_class.students) + len(each_class.waitlist)
         each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 20
 
 #9 classes with 34 total sections of core classes

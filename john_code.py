@@ -101,6 +101,15 @@ def find_leaving_students(students):
         students.remove(student)
 
 
+
+def assign_grade_to_student(difficulty, passfail = True):
+    if passfail:
+        return 1.0 if random.random() >= (difficulty) else 0.0
+    else:
+        grade = random.random()
+        return grade if grade >= () (difficulty) else 0.0
+
+
 # a term is a list of courses
 def update_students_with_new_grades(term):
     global passfail
@@ -111,15 +120,6 @@ def update_students_with_new_grades(term):
         for student in course.students:
             grade = assign_grade_to_student(course.difficulty, passfail)
             student.add_course_grade(course.course_id,grade)
-
-
-def assign_grade_to_student(difficulty, passfail = True):
-    if passfail:
-        return 1.0 if random.random() >= (difficulty) else 0.0
-    else:
-        grade = random.random()
-        return grade if grade >= () (difficulty) else 0.0
-
 
 # term is a list of courses for the semester
 def find_plans_to_retake(term):
@@ -157,9 +157,12 @@ def sort_students(student1, student2):
     else:
         return 1
 
+
 def remove_students_from_courses(term):
     for course in term:
         course.students = []
+        course.waitlist = []
+
 
 def populate_courses_with_students(term,students):
     required = []
@@ -176,22 +179,28 @@ def populate_courses_with_students(term,students):
         max_courses = 2 + (1 if random.random() < student.skill_level else 0)
         #try to retake courses the student plans to retake first
         for course_id in student.plan_to_retake:
+            if len(courses_taken) >= max_courses:
+                break
             if course_id <= 400:
                 # elective
                 for i in range(len(electives)):
-                    if course_id == electives[i].course_id and len(courses_taken) < max_courses:
-                        if electives[i].class_size > len(electives[i].students):
-                            courses_taken.append(course_id)
-                            electives[i].students.append(student)
+                    if course_id == electives[i].course_id:
+                        if len(courses_taken) < max_courses:
+                            if electives[i].class_size > len(electives[i].students):
+                                courses_taken.append(course_id)
+                                electives[i].students.append(student)
+                        else:
+                            electives[i].waitlist.append(student)
             else:
                 # required
                 for i in range(len(required)):
-                    if course_id == required[i].course_id and len(courses_taken) < max_courses:
-                        if required[i].class_size > len(required[i].students):
-                            courses_taken.append(course_id)
-                            required[i].students.append(student)
-                            if len(courses_taken) == max_courses:
-                                continue
+                    if course_id == required[i].course_id
+                        if len(courses_taken) < max_courses:
+                            if required[i].class_size > len(required[i].students):
+                                courses_taken.append(course_id)
+                                required[i].students.append(student)
+                        else:
+                            required[i].waitlist.append(student)
 
         # remove the courses we just added from plan_to_retake  
         for course_id in courses_taken:
@@ -203,20 +212,25 @@ def populate_courses_with_students(term,students):
             if len(courses_taken) >= max_courses:
                 break
 
-            if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size >= len(course.students):
-                courses_taken.append(course.course_id)
-                course.students.append(student)
+            if course.course_id not in courses_taken and course.course_id not in student.course_transcript:
+                if course.class_size >= len(course.students):
+                    courses_taken.append(course.course_id)
+                    course.students.append(student)
+                else:
+                    course.waitlist.append(student)
 
         for course in electives:
             if len(courses_taken) >= max_courses:
                 break
 
-            if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size>=len(course.students):
-                courses_taken.append(course.course_id)
-                course.students.append(student)
+            if course.course_id not in courses_taken and course.course_id not in student.course_transcript:
+                if course.class_size >= len(course.students):
+                    courses_taken.append(course.course_id)
+                    course.students.append(student)
+                else:
+                    course.waitlist.append(student)
 
+                    
 
 def runloop(students, term, num_incoming):
     global verbose
