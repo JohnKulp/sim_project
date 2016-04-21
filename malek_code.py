@@ -407,6 +407,6 @@ if __name__ == "__main__":
             print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
             print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
             print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
-            print("graduates failed an average of %d class(es)"%average_fail)
-            print ("graduates took an average of %d semesters to graduate"%average_time)
+            print("average number of classes failed by graduates: %d "%average_fail)
+            print ("average number of semesters to graduate: %d "%average_time)
 
