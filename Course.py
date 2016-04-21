@@ -14,5 +14,3 @@ class Course():
 		self.term = term
 		self.is_core = is_core
 		self.requirements = [] if requirements == None else requirements
-		self.requirements = requirements
-

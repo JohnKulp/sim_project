@@ -2,17 +2,15 @@ import numpy as np
 
 class Student():
 
-	def __init__(self, course_transcript=None, classes_failed = None, classes_passed = None, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = None, student_id = 0):
+	def __init__(self, course_transcript=None, classes_failed = None, classes_passed = None, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = None, student_id = 0, is_minor=False):
 		self.student_id = student_id #for printing purposes
 		self.GPA = GPA
-		course_transcript = {} if course_transcript == None else course_transcript
-		self.course_transcript = course_transcript
+		self.course_transcript = {} if course_transcript == None else course_transcript
 		self.semesters_completed = semesters_completed
-		classes_failed = {} if classes_failed == None else classes_failed
-		self.classes_failed = classes_failed
+		self.classes_failed = {} if classes_failed == None else classes_failed
 		self.skill_level = skill_level
-		plan_to_retake = [] if plan_to_retake == None else plan_to_retake
-		self.plan_to_retake = plan_to_retake
+		self.plan_to_retake = [] if plan_to_retake == None else plan_to_retake
+		self.is_minor = is_minor
 
 	def add_course_grade(self, course_id, grade):
 		if grade < .7:

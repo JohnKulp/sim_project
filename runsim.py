@@ -10,7 +10,8 @@ import sys
 global student_id_inc
 global passfail
 global dropouts
-global graduates 
+global graduates
+global minors 
 global core_classes
 
 #electives globals
@@ -84,7 +85,7 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc))
+        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .5))
         student_id_inc +=1
 
     return students
@@ -94,25 +95,32 @@ def generate_students(num_to_generate):
 def find_leaving_students(students):
     global graduates
     global dropouts
+    global minors
+    global core_classes
 
-    new_grads_or_dropouts = []
+    new_grads_or_dropouts_or_minors = []
 
+    core_class_ids = [x.course_id for x in core_classes]
 
     for student in students:
         dropout_chance = random.random() < .01
 
         if completed_core_classes(student):
             graduates.append(student)
-            new_grads_or_dropouts.append(student)
+            new_grads_or_dropouts_or_minors.append(student)
+
+        elif student.is_minor and len([x for x in classes_passed(student) if x in core_class_ids]) >= 5:
+        	minors.append(student)
+        	new_grads_or_dropouts_or_minors.append(student)
 
         elif len(student.classes_failed) > 10 or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
             #print("someone is leaving.  They failed {} classes, the dropout chance was {}, and the semesters completed was {}".format(
             #    student.classes_failed, dropout_chance, student.semesters_completed))
             dropouts.append(student)
-            new_grads_or_dropouts.append(student)
+            new_grads_or_dropouts_or_minors.append(student)
 
 
-    for student in new_grads_or_dropouts:
+    for student in new_grads_or_dropouts_or_minors:
         students.remove(student)
 
 
@@ -145,12 +153,13 @@ def find_plans_to_retake(term):
                 student.plan_to_retake.append(course.course_id)
 
 
-
+def classes_passed(student):
+	return [x for x, grade in student.course_transcript.items() if grade >= .7]
 
 def completed_core_classes(student):
     global core_classes
 
-    passed_classes = [x for x, grade in student.course_transcript.items() if grade >= .7]
+    passed_classes = classes_passed(student)
 
     required = [x.course_id for x in core_classes]
 
@@ -266,6 +275,7 @@ if __name__ == "__main__":
     global passfail
     global dropouts
     global graduates
+    global minors
     global student_id_inc
     global core_classes
 
@@ -281,6 +291,7 @@ if __name__ == "__main__":
     passfail = True
     dropouts = []
     graduates = []
+    minors = []
     student_id_inc = 0
 
     if len(sys.argv) <2 or len(sys.argv) > 3:
@@ -322,10 +333,16 @@ if __name__ == "__main__":
         for dropout in dropouts:
             dropout_ids.append(dropout.student_id)
 
+    	minor_ids = []
+    	for minor in minors:
+    		minor_ids.append(minor.student_id)
+
         student_ids.sort()
         grad_ids.sort()
         dropout_ids.sort()
+        minor_ids.sort()
 
         print("students at end of sim: {}".format(len(student_ids)))
         print("graduates at end of sim: {}".format(len(grad_ids)))
         print("dropouts at end of sim: {}".format(len(dropout_ids)))
+        print("minors at the end of sim: {}".format(len(minor_ids)))
