@@ -17,19 +17,25 @@ global core_classes
 global elective_bag
 global electives_inc
 
+
+#distribution will be a dictionary of class num to a modifying value:
+#e.g. [401: 4.15, 441:3.2, 1501:3, 445: 5.38 , ...]
+def calculate_class_size(core_classes, distribution):
+    pass
+
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401)
-    cs441 = Course(441)
-    cs445 = Course(445, requirements=[401])
-    cs447 = Course(447, requirements=[445])
-    cs449 = Course(449, requirements=[447])
-    cs1501 = Course(1501, requirements=[401, 445])
-    cs1502 = Course(1502, requirements=[441, 445])
-    cs1550 = Course(1550, requirements=[447, 449])
+    cs401 = Course(401, difficulty = .1)
+    cs441 = Course(441, difficulty = .05)
+    cs445 = Course(445, requirements=[401], difficulty = .15)
+    cs447 = Course(447, requirements=[445], difficulty = .15)
+    cs449 = Course(449, requirements=[447], difficulty = .1)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -52,7 +58,7 @@ def generate_electives(number_of_electives):
     if len(electives_bag) < number_of_electives:
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
-            electives_bag.append(Course(i, requirements = 445, is_core = False))
+            electives_bag.append(Course(i, requirements = 445, is_core = False, difficulty = .15))
             electives_inc += 1
 
     #pick from a deep copy of the bag
