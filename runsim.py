@@ -69,7 +69,7 @@ def generate_electives(number_of_electives):
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
             requirement = [445] if random.random() < .2 else [1501]
-            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .05, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
