@@ -219,7 +219,7 @@ def populate_courses_with_students(term,students):
                 break
 
             if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size >= len(course.students):
+                    and course.class_size > len(course.students):
                 courses_taken.append(course.course_id)
                 course.students.append(student)
 
@@ -228,7 +228,7 @@ def populate_courses_with_students(term,students):
                 break
 
             if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
-                    and course.class_size>=len(course.students):
+                    and course.class_size > len(course.students):
                 courses_taken.append(course.course_id)
                 course.students.append(student)
 
