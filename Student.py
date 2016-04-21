@@ -2,7 +2,7 @@ import numpy as np
 
 class Student():
 
-	def __init__(self, course_transcript=None, classes_failed = None, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = None, student_id = 0):
+	def __init__(self, course_transcript=None, classes_failed = None, classes_passed = None, semesters_completed=0, GPA=None, skill_level = 1, plan_to_retake = None, student_id = 0):
 		self.student_id = student_id #for printing purposes
 		self.GPA = GPA
 		course_transcript = {} if course_transcript == None else course_transcript
