@@ -17,19 +17,33 @@ global core_classes
 global elective_bag
 global electives_inc
 
+
+#distribution will be a dictionary of class num to a modifying value:
+#e.g. [401: 4.15, 441:3.2, 1501:3, 445: 5.38 , ...]
+def calculate_class_sizes(num_sections):
+    global core_classes
+
+    total = 0
+    for each_class in core_classes:
+        total += len(each_class.students) + each_class.waitlist
+
+    for each_class in core_classes:
+        level_of_interest = len(each_class.students) + len(each_class.waitlist)
+        each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 40
+
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401)
-    cs441 = Course(441)
-    cs445 = Course(445, requirements=[401])
-    cs447 = Course(447, requirements=[445])
-    cs449 = Course(449, requirements=[447])
-    cs1501 = Course(1501, requirements=[401, 445])
-    cs1502 = Course(1502, requirements=[441, 445])
-    cs1550 = Course(1550, requirements=[447, 449])
+    cs401 = Course(401, difficulty = .05, class_size = 7*40)
+    cs441 = Course(441, difficulty = .025, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = .075, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .075, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .05, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .1, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .05, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .125, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -52,7 +66,8 @@ def generate_electives(number_of_electives):
     if len(electives_bag) < number_of_electives:
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
-            electives_bag.append(Course(i, requirements = 445, is_core = False))
+            requirement = [445] if random.random() < .2 else [1501]
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -101,15 +116,6 @@ def find_leaving_students(students):
         students.remove(student)
 
 
-
-def assign_grade_to_student(difficulty, passfail = True):
-    if passfail:
-        return 1.0 if random.random() >= (difficulty) else 0.0
-    else:
-        grade = random.random()
-        return grade if grade >= () (difficulty) else 0.0
-
-
 # a term is a list of courses
 def update_students_with_new_grades(term):
     global passfail
@@ -120,6 +126,15 @@ def update_students_with_new_grades(term):
         for student in course.students:
             grade = assign_grade_to_student(course.difficulty, passfail)
             student.add_course_grade(course.course_id,grade)
+
+
+def assign_grade_to_student(difficulty, passfail = True):
+    if passfail:
+        return 1.0 if random.random() >= (difficulty) else 0.0
+    else:
+        grade = random.random()
+        return grade if grade >= 1 - difficulty else 0.0
+
 
 # term is a list of courses for the semester
 def find_plans_to_retake(term):
@@ -157,12 +172,9 @@ def sort_students(student1, student2):
     else:
         return 1
 
-
 def remove_students_from_courses(term):
     for course in term:
         course.students = []
-        course.waitlist = []
-
 
 def populate_courses_with_students(term,students):
     required = []
@@ -179,28 +191,22 @@ def populate_courses_with_students(term,students):
         max_courses = 2 + (1 if random.random() < student.skill_level else 0)
         #try to retake courses the student plans to retake first
         for course_id in student.plan_to_retake:
-            if len(courses_taken) >= max_courses:
-                break
             if course_id <= 400:
                 # elective
                 for i in range(len(electives)):
-                    if course_id == electives[i].course_id:
-                        if len(courses_taken) < max_courses:
-                            if electives[i].class_size > len(electives[i].students):
-                                courses_taken.append(course_id)
-                                electives[i].students.append(student)
-                        else:
-                            electives[i].waitlist.append(student)
+                    if course_id == electives[i].course_id and len(courses_taken) < max_courses:
+                        if electives[i].class_size > len(electives[i].students):
+                            courses_taken.append(course_id)
+                            electives[i].students.append(student)
             else:
                 # required
                 for i in range(len(required)):
-                    if course_id == required[i].course_id
-                        if len(courses_taken) < max_courses:
-                            if required[i].class_size > len(required[i].students):
-                                courses_taken.append(course_id)
-                                required[i].students.append(student)
-                        else:
-                            required[i].waitlist.append(student)
+                    if course_id == required[i].course_id and len(courses_taken) < max_courses:
+                        if required[i].class_size > len(required[i].students):
+                            courses_taken.append(course_id)
+                            required[i].students.append(student)
+                            if len(courses_taken) == max_courses:
+                                continue
 
         # remove the courses we just added from plan_to_retake  
         for course_id in courses_taken:
@@ -212,31 +218,24 @@ def populate_courses_with_students(term,students):
             if len(courses_taken) >= max_courses:
                 break
 
-            if course.course_id not in courses_taken and course.course_id not in student.course_transcript:
-                if course.class_size >= len(course.students):
-                    courses_taken.append(course.course_id)
-                    course.students.append(student)
-                else:
-                    course.waitlist.append(student)
+            if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
+                    and course.class_size > len(course.students):
+                courses_taken.append(course.course_id)
+                course.students.append(student)
 
         for course in electives:
             if len(courses_taken) >= max_courses:
                 break
 
-            if course.course_id not in courses_taken and course.course_id not in student.course_transcript:
-                if course.class_size >= len(course.students):
-                    courses_taken.append(course.course_id)
-                    course.students.append(student)
-                else:
-                    course.waitlist.append(student)
+            if course.course_id not in courses_taken and course.course_id not in student.course_transcript \
+                    and course.class_size > len(course.students):
+                courses_taken.append(course.course_id)
+                course.students.append(student)
 
-                    
 
 def runloop(students, term, num_incoming):
     global verbose
 
-    if verbose:
-        print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
     new_students = generate_students(num_incoming)
 
     #this causes a deep change in the object instead of changing list pointer
@@ -246,17 +245,20 @@ def runloop(students, term, num_incoming):
 
     populate_courses_with_students(term, students)
     if verbose:
-        print ("{}, size: {}, students: {}, term: {}".format(term[2].course_id, term[2].class_size, term[2].students, term[2].term))
+        print ("{}, size: {}, students: {}, term: {}, waitlist: {}".format(term[2].course_id, term[2].class_size, len(term[2].students), term[2].term, term[2].waitlist))
     
     update_students_with_new_grades(term)
 
+
     find_leaving_students(students)
     find_plans_to_retake(term)
-    courses.sort(key=lambda x: x.course_id)
 
+    courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
     for student in students:
         student.semesters_completed +=1
+
+
     return students
 
 
@@ -271,19 +273,9 @@ if __name__ == "__main__":
     global electives_bag
     global electives_inc
 
-    electives_bag = []
-    electives_inc = 0
 
-    core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
-
-
-    passfail = True
-    dropouts = []
-    graduates = []
-    student_id_inc = 0
-
-    if len(sys.argv) <2 or len(sys.argv) > 3:
-        print("run with number of iterations as an argument")
+    if len(sys.argv) <3 or len(sys.argv) > 4:
+        print("run with number of terms and number of iterations to run that many terms as an argument")
     else:
 
         if len(sys.argv) == 3:
@@ -291,23 +283,42 @@ if __name__ == "__main__":
         else:
             verbose = False
 
-        num_iterations = int(sys.argv[1])
+        num_terms = int(sys.argv[1])
+        num_iterations = int(sys.argv[2])
 
-        students = []
-        core_classes = generate_core_courses(30)
-        courses = generate_electives(14) + core_classes
 
         for i in range(num_iterations):
-            #print("\n\nsemester {}".format(i))
-            students = runloop(students, courses, 100)
 
-        print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
-        print("{} students were still in the system.".format(len(students)))
-        print("some sample GPAs were: ")
-        for i in range(10):
-            if len(graduates)>=i:
-                break
-            print(graduates[i].calculate_GPA())
+            #set term variables
+
+            electives_bag = []
+            electives_inc = 0
+
+            core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
+
+
+            passfail = True
+            dropouts = []
+            graduates = []
+            student_id_inc = 0
+
+
+            students = []
+            core_classes = generate_core_courses(30)
+            courses = generate_electives(14) + core_classes
+
+            for z in range(num_terms):
+                if verbose:
+                    print("\n\nsemester {}".format(z))
+                students = runloop(students, courses, 275)
+
+            print("at the end of simulation {}, there were {} dropouts and {} graduates".format(i, len(dropouts), len(graduates)))
+            print("{} students were still in the system.".format(len(students)))
+            print("some sample GPAs were: ")
+            for i in range(10):
+                if len(graduates)>=i:
+                    break
+                print(graduates[i].calculate_GPA())
 
         student_ids = []
         for student in students:
