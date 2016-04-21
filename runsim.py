@@ -134,7 +134,7 @@ def find_plans_to_retake(term):
 def completed_core_classes(student):
     global core_classes
 
-    passed_classes = [x for x, grade in student.course_transcript.iteritems() if grade >= .7]
+    passed_classes = [x for x, grade in student.course_transcript.items() if grade >= .7]
 
     required = [x.course_id for x in core_classes]
 
