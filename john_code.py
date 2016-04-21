@@ -294,9 +294,6 @@ if __name__ == "__main__":
             electives_bag = []
             electives_inc = 0
 
-            core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
-
-
             passfail = True
             dropouts = []
             graduates = []

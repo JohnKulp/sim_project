@@ -26,11 +26,12 @@ def calculate_class_sizes(num_sections):
 
     total = 0
     for each_class in core_classes:
-        total += len(each_class.students) + each_class.waitlist
-
+        total += len(each_class.students) + len(each_class.waitlist)
     for each_class in core_classes:
         level_of_interest = len(each_class.students) + len(each_class.waitlist)
-        each_class.class_size = int(round(num_sections/(level_of_interest /total))) * 40
+        ratio_of_interest = level_of_interest/total
+        ratio_of_interest = num_sections if ratio_of_interest == 0 else ratio_of_interest
+        each_class.class_size = int(round(num_sections/ratio_of_interest)) * 40
 
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
@@ -98,6 +99,10 @@ def find_leaving_students(students):
     global minors
     global core_classes
 
+    global num_dropped_out_for_failed_classes
+    global num_dropped_out_for_dropout_rate
+    global num_dropped_out_for_too_many_semesters
+
     new_grads_or_dropouts_or_minors = []
 
     core_class_ids = [x.course_id for x in core_classes]
@@ -110,12 +115,18 @@ def find_leaving_students(students):
             new_grads_or_dropouts_or_minors.append(student)
 
         elif student.is_minor and len([x for x in classes_passed(student) if x in core_class_ids]) >= 5:
-        	minors.append(student)
-        	new_grads_or_dropouts_or_minors.append(student)
+            minors.append(student)
+            new_grads_or_dropouts_or_minors.append(student)
 
         elif len(student.classes_failed) > 10 or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
             #print("someone is leaving.  They failed {} classes, the dropout chance was {}, and the semesters completed was {}".format(
             #    student.classes_failed, dropout_chance, student.semesters_completed))
+            if len(student.classes_failed) > 10:
+                num_dropped_out_for_failed_classes +=1
+            if dropout_chance:
+                num_dropped_out_for_dropout_rate +=1
+            if student.semesters_completed > 12:
+                num_dropped_out_for_too_many_semesters +=1
             dropouts.append(student)
             new_grads_or_dropouts_or_minors.append(student)
 
@@ -154,7 +165,7 @@ def find_plans_to_retake(term):
 
 
 def classes_passed(student):
-	return [x for x, grade in student.course_transcript.items() if grade >= .7]
+    return [x for x, grade in student.course_transcript.items() if grade >= .7]
 
 def completed_core_classes(student):
     global core_classes
@@ -261,6 +272,7 @@ def runloop(students, term, num_incoming):
 
     find_leaving_students(students)
     find_plans_to_retake(term)
+    calculate_class_sizes(40)
 
     courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
@@ -280,71 +292,82 @@ if __name__ == "__main__":
     global student_id_inc
     global core_classes
 
+    global num_dropped_out_for_failed_classes
+    global num_dropped_out_for_dropout_rate
+    global num_dropped_out_for_too_many_semesters
+
     global electives_bag
     global electives_inc
 
-    electives_bag = []
-    electives_inc = 0
 
-    core_classes = {0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1}
-
-
-    passfail = True
-    dropouts = []
-    graduates = []
-    minors = []
-    student_id_inc = 0
-
-    if len(sys.argv) <2 or len(sys.argv) > 3:
-        print("run with number of iterations as an argument")
+    if len(sys.argv) <3 or len(sys.argv) > 4:
+        print("run with number of terms and number of iterations to run that many terms as an argument")
     else:
 
-        if len(sys.argv) == 3:
+        if len(sys.argv) == 4:
             verbose = True
         else:
             verbose = False
 
-        num_iterations = int(sys.argv[1])
+        num_terms = int(sys.argv[1])
+        num_iterations = int(sys.argv[2])
 
-        students = []
-        core_classes = generate_core_courses(30)
-        courses = generate_electives(14) + core_classes
 
         for i in range(num_iterations):
-            if verbose:
-                print("\n\nsemester {}".format(i))
-            students = runloop(students, courses, 275)
+            print("\niteration {}".format(i+1))
+            #set term variables
 
-        print("at the end of the simulation, there were {} dropouts and {} graduates".format(len(dropouts), len(graduates)))
-        print("{} students were still in the system.".format(len(students)))
-        print("some sample GPAs were: ")
-        for i in range(10):
-            if len(graduates)>=i:
-                break
-            print(graduates[i].calculate_GPA())
+            electives_bag = []
+            electives_inc = 0
 
-        student_ids = []
-        for student in students:
-            student_ids.append(student.student_id)
+            passfail = True
+            dropouts = []
+            graduates = []
+            student_id_inc = 0
+            minors = []
 
-        grad_ids = []
-        for graduate in graduates:
-            grad_ids.append(graduate.student_id)
+            num_dropped_out_for_failed_classes = 0
+            num_dropped_out_for_dropout_rate = 0
+            num_dropped_out_for_too_many_semesters = 0
 
-        dropout_ids = []
-        for dropout in dropouts:
-            dropout_ids.append(dropout.student_id)
 
-    	minor_ids = []
-    	for minor in minors:
-    		minor_ids.append(minor.student_id)
+            students = []
+            core_classes = generate_core_courses(30)
+            courses = generate_electives(14) + core_classes
 
-        student_ids.sort()
-        grad_ids.sort()
-        dropout_ids.sort()
-        minor_ids.sort()
+            for z in range(num_terms):
+                if verbose:
+                    print("\n\nsemester {}".format(z))
+                students = runloop(students, courses, 275)
 
-        print("students at end of sim: {}".format(len(student_ids)))
-        print("graduates at end of sim: {}".format(len(grad_ids)))
-        print("dropouts at end of sim: {}".format(len(dropout_ids)))
-        print("minors at the end of sim: {}".format(len(minor_ids)))
+            student_ids = []
+            for student in students:
+                student_ids.append(student.student_id)
+
+            grad_ids = []
+            for graduate in graduates:
+                grad_ids.append(graduate.student_id)
+
+            dropout_ids = []
+            for dropout in dropouts:
+                dropout_ids.append(dropout.student_id)
+
+            minor_ids = []
+            for minor in minors:
+                minor_ids.append(minor.student_id)
+
+            student_ids.sort()
+            grad_ids.sort()
+            dropout_ids.sort()
+            minor_ids.sort()
+
+            print("students at end of sim: {}".format(len(student_ids)))
+            print("graduates at end of sim: {}".format(len(grad_ids)))
+            print("dropouts at end of sim: {}".format(len(dropout_ids)))
+            print("minors at the end of sim: {}".format(len(minor_ids)))
+
+            print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
+            print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
+            print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
+
+
