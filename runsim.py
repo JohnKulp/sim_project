@@ -14,6 +14,9 @@ global graduates
 global minors 
 global core_classes
 
+global fall_interest
+global spring_interest
+
 #electives globals
 global elective_bag
 global electives_inc
@@ -21,7 +24,7 @@ global electives_inc
 
 #distribution will be a dictionary of class num to a modifying value:
 #e.g. [401: 4.15, 441:3.2, 1501:3, 445: 5.38 , ...]
-def calculate_class_sizes(num_sections):
+def calculate_class_sizes(is_fall, num_sections):
     global core_classes
 
     total = 0
@@ -31,7 +34,22 @@ def calculate_class_sizes(num_sections):
         level_of_interest = len(each_class.students) + len(each_class.waitlist)
         ratio_of_interest = level_of_interest/total
         ratio_of_interest = num_sections if ratio_of_interest == 0 else ratio_of_interest
-        each_class.class_size = int(round(num_sections/ratio_of_interest)) * 40
+        if is_fall:
+            fall_interest[each_class.course_id] = int(round(num_sections/ratio_of_interest)) * 40
+        else:
+            spring_interest[each_class.course_id] = int(round(num_sections/ratio_of_interest)) * 40
+
+def set_class_sizes(is_fall):
+    if is_fall:
+        size_list = fall_interest
+    else:
+        size_list = spring_interest
+    if len(size_list) == 0:
+        return
+
+    for course in core_classes:
+        course.class_size = size_list[course.course_id]
+
 
 #9 classes with 34 total sections of core classes
 def generate_core_courses(num_core):
@@ -261,8 +279,10 @@ def populate_courses_with_students(term,students):
                 course.students.append(student)
 
 
-def runloop(students, term, num_incoming):
+def runloop(students, term, num_incoming, is_fall):
     global verbose
+
+    set_class_sizes(is_fall)
 
     new_students = generate_students(num_incoming)
 
@@ -280,7 +300,8 @@ def runloop(students, term, num_incoming):
 
     find_leaving_students(students)
     find_plans_to_retake(term)
-    calculate_class_sizes(40)
+
+    calculate_class_sizes(is_fall, 40)
 
     courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
@@ -303,6 +324,9 @@ if __name__ == "__main__":
     global num_dropped_out_for_failed_classes
     global num_dropped_out_for_dropout_rate
     global num_dropped_out_for_too_many_semesters
+
+    global fall_interest
+    global spring_interest
 
     global electives_bag
     global electives_inc
@@ -328,6 +352,9 @@ if __name__ == "__main__":
             electives_bag = []
             electives_inc = 0
 
+            fall_interest = {}
+            spring_interest = {}
+
             passfail = True
             dropouts = []
             graduates = []
@@ -346,7 +373,7 @@ if __name__ == "__main__":
             for z in range(num_terms):
                 if verbose:
                     print("\n\nsemester {}".format(z))
-                students = runloop(students, courses, (275 if z % 2 == 0 else 150))
+                students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
 
             student_ids = []
             for student in students:
