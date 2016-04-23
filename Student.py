@@ -10,12 +10,14 @@ class Student():
 		self.classes_failed = {} if classes_failed == None else classes_failed
 		self.skill_level = skill_level
 		self.plan_to_retake = [] if plan_to_retake == None else plan_to_retake
+		self.failed_class_this_semester=False
 		self.is_minor = is_minor
 
 	def add_course_grade(self, course_id, grade):
 		if grade < .7:
 			self.classes_failed.setdefault(course_id, 0)
 			self.classes_failed[course_id] += 1
+			self.failed_class_this_semester = True
 
 		#set self.course_transcript[course_id] to be grade
 		if self.course_transcript.setdefault(course_id, grade) != grade:
