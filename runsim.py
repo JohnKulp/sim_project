@@ -86,7 +86,7 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .35))
+        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .8))
         student_id_inc +=1
 
     return students
@@ -110,6 +110,14 @@ def find_leaving_students(students):
     for student in students:
         dropout_chance = random.random() < .01
 
+        fail_drop = False
+        if student.failed_class_this_semester:
+            student.failed_class_this_semester == False
+            core_ids = [x.course_id for x in core_classes]
+            core_num_passed = len([x for x in classes_passed(student) if x in core_ids])
+            if random.random() < -.1/7 * core_num_passed + .1:
+                fail_drop = True
+
         if completed_core_classes(student):
             graduates.append(student)
             new_grads_or_dropouts_or_minors.append(student)
@@ -118,10 +126,10 @@ def find_leaving_students(students):
             minors.append(student)
             new_grads_or_dropouts_or_minors.append(student)
 
-        elif len(student.classes_failed) > 10 or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
+        elif fail_drop or dropout_chance or student.semesters_completed > 12:#or completed exactly half the core courses and 50%
             #print("someone is leaving.  They failed {} classes, the dropout chance was {}, and the semesters completed was {}".format(
             #    student.classes_failed, dropout_chance, student.semesters_completed))
-            if len(student.classes_failed) > 10:
+            if fail_drop:
                 num_dropped_out_for_failed_classes +=1
             if dropout_chance:
                 num_dropped_out_for_dropout_rate +=1
@@ -338,7 +346,7 @@ if __name__ == "__main__":
             for z in range(num_terms):
                 if verbose:
                     print("\n\nsemester {}".format(z))
-                students = runloop(students, courses, 275)
+                students = runloop(students, courses, (275 if z % 2 == 0 else 150))
 
             student_ids = []
             for student in students:
