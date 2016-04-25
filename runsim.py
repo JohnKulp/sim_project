@@ -360,6 +360,8 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
     global electives_bag
     global electives_inc
 
+    text_file = open("baseline.txt", "w")
+    text_file.write("InSystem Graduates Dropouts Minors NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time\n\n")
 
     for i in range(num_iterations):
         print("\niteration {}".format(i+1))
@@ -458,6 +460,10 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
         print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
 
         print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
+
+        text_file.write("%d %d %d %d %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
+
+    text_file.close()
 
 if __name__ == "__main__":
 
