@@ -57,14 +57,14 @@ def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = -.05, class_size = 7*40)
-    cs441 = Course(441, difficulty = -.1, class_size = 6*40)
-    cs445 = Course(445, requirements=[401], difficulty = -.03, class_size = 5*40)
-    cs447 = Course(447, requirements=[445], difficulty = .01, class_size = 5*40)
-    cs449 = Course(449, requirements=[447], difficulty = .03, class_size = 4*40)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .05, class_size = 4*40)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = -.04, class_size = 3*40)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .06, class_size = 2*40)
+    cs401 = Course(401, difficulty = .1, class_size = 7*40)
+    cs441 = Course(441, difficulty = .05, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -360,8 +360,11 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
     global electives_bag
     global electives_inc
 
-    text_file = open("baseline.txt", "w")
-    text_file.write("InSystem Graduates Dropouts Minors NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time\n\n")
+    stats_output = open("baseline.txt", "w")
+    stats_output.write("Semesters: %d\nIterations: %d\n\n" % (num_semesters, num_iterations))
+    stats_output.write("CurrStudents Grads Drops Mins GradRate AvgGradTime AvgGradClassFailed NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time\n\n")
+
+    course_fail_freq = open("coursesfailed_baseline.txt", "w")
 
     for i in range(num_iterations):
         print("\niteration {}".format(i+1))
@@ -444,16 +447,19 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
         dropout_ids.sort()
         minor_ids.sort()
 
-        failed_courses_by_all = Counter(failed_classes).most_common
+        failed_courses_by_all = Counter(failed_classes).most_common()
 
         print("students at end of sim: {}".format(len(student_ids)))
         print("graduates at end of sim: {}".format(len(grad_ids)))
         print("dropouts at end of sim: {}".format(len(dropout_ids)))
         print("minors at the end of sim: {}".format(len(minor_ids)))
 
-        print("graduation rate: {}".format(len(grad_ids)/((len(grad_ids)+len(dropouts)))))
-        print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
-        print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
+        grad_rate = len(grad_ids)/((len(grad_ids)+len(dropouts)))
+        avg_time = get_average_time_in_system(graduates)
+        avg_classes_failed = get_average_classes_failed(graduates)
+        print("graduation rate: {}".format(grad_rate))
+        print("average time a graduate is in the system {}".format(avg_time))
+        print("average graduate classes failed {}".format(avg_classes_failed))
 
         print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
         print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
@@ -461,9 +467,13 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
 
         print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
 
-        text_file.write("%d %d %d %d %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
+        stats_output.write("%d %d %d %d %.3f %.3f %d %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), grad_rate, avg_time, avg_classes_failed, num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
+        for value, count in failed_courses_by_all:
+            course_fail_freq.write("%d : %d " % (value, count))
+        course_fail_freq.write("\n")
 
-    text_file.close()
+    stats_output.close()
+    course_fail_freq.close()
 
 if __name__ == "__main__":
 
