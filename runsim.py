@@ -312,6 +312,29 @@ def runloop(students, term, num_incoming, is_fall):
 
     return students
 
+#takes the number of semester from graduates and returns an average
+def get_average_time_in_system(student_list):
+    total_semesters=0
+    average_semester=0
+    for student in student_list:
+        total_semesters+=student.semesters_completed
+    if total_semesters!=0:
+        average_semester=float(total_semesters)/len(student_list)        
+    return average_semester
+
+
+#takes number of classes failed from graduates and returns an average
+def get_average_classes_failed(student_list):
+    total_failed=0
+    average_failed=0
+    
+    for student in student_list:
+        for key in student.classes_failed:
+            total_failed += int(student.classes_failed[key])
+
+    if total_failed!=0:
+        average_failed=float(total_failed)/len(student_list)     
+    return average_failed
 
 if __name__ == "__main__":
 
@@ -417,6 +440,9 @@ if __name__ == "__main__":
             print("graduates at end of sim: {}".format(len(grad_ids)))
             print("dropouts at end of sim: {}".format(len(dropout_ids)))
             print("minors at the end of sim: {}".format(len(minor_ids)))
+
+            print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
+            print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
 
             print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
             print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
