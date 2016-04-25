@@ -360,6 +360,10 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
     global electives_bag
     global electives_inc
 
+    global verbose
+
+    verbose = False
+
     stats_output = open("baseline.txt", "w")
     stats_output.write("Semesters: %d\nIterations: %d\n\n" % (num_semesters, num_iterations))
     stats_output.write("CurrStudents Grads Drops Mins GradRate AvgGradTime AvgGradClassFailed NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time\n\n")
@@ -474,6 +478,8 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
 
     stats_output.close()
     course_fail_freq.close()
+
+    return [grad_rate, avg_time]
 
 if __name__ == "__main__":
 

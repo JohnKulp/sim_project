@@ -1,6 +1,5 @@
-Semesters: 500
-Iterations: 50
+Semesters: 81
+Iterations: 10
 
 CurrStudents Grads Drops Mins GradRate AvgGradTime AvgGradClassFailed NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time
 
-852 38506 22710 44994 0.63 6.03 3.66 13564 4616 4796
