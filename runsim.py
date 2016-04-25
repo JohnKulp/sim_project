@@ -2,6 +2,7 @@ from Student import *
 from Faculty import *
 from Course import *
 
+from collections import Counter
 import operator
 import random
 import scipy.stats as st
@@ -375,26 +376,42 @@ if __name__ == "__main__":
                     print("\n\nsemester {}".format(z))
                 students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
 
+            failed_classes = []
+
             student_ids = []
             for student in students:
                 student_ids.append(student.student_id)
+                for key in student.classes_failed:
+                    for i in range(int(student.classes_failed[key])):
+                        failed_classes.append(key)
 
             grad_ids = []
             for graduate in graduates:
                 grad_ids.append(graduate.student_id)
+                for key in graduate.classes_failed:
+                    for i in range(int(graduate.classes_failed[key])):
+                        failed_classes.append(key)
 
             dropout_ids = []
             for dropout in dropouts:
                 dropout_ids.append(dropout.student_id)
+                for key in dropout.classes_failed:
+                    for i in range(int(dropout.classes_failed[key])):
+                        failed_classes.append(key)
 
             minor_ids = []
             for minor in minors:
                 minor_ids.append(minor.student_id)
+                for key in minor.classes_failed:
+                    for i in range(int(minor.classes_failed[key])):
+                        failed_classes.append(key)
 
             student_ids.sort()
             grad_ids.sort()
             dropout_ids.sort()
             minor_ids.sort()
+
+            failed_courses_by_all = Counter(failed_classes).most_common
 
             print("students at end of sim: {}".format(len(student_ids)))
             print("graduates at end of sim: {}".format(len(grad_ids)))
@@ -405,4 +422,4 @@ if __name__ == "__main__":
             print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
             print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
 
-
+            print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
