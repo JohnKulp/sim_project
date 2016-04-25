@@ -309,7 +309,6 @@ def runloop(students, term, num_incoming, is_fall):
 
     calculate_class_sizes(is_fall, 40)
 
-    courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
     for student in students:
         student.semesters_completed +=1
@@ -341,7 +340,8 @@ def get_average_classes_failed(student_list):
         average_failed=float(total_failed)/len(student_list)     
     return average_failed
 
-if __name__ == "__main__":
+
+def main_loop(num_semesters, num_iterations, num_runs_before_start):
 
     global passfail
     global dropouts
@@ -361,97 +361,117 @@ if __name__ == "__main__":
     global electives_inc
 
 
-    if len(sys.argv) <3 or len(sys.argv) > 4:
+    for i in range(num_iterations):
+        print("\niteration {}".format(i+1))
+        #set term variables
+        electives_bag = []
+        electives_inc = 0
+
+        fall_interest = {}
+        spring_interest = {}
+
+        passfail = True
+        dropouts = []
+        graduates = []
+        student_id_inc = 0
+        minors = []
+
+        num_dropped_out_for_failed_classes = 0
+        num_dropped_out_for_dropout_rate = 0
+        num_dropped_out_for_too_many_semesters = 0
+
+
+        students = []
+        core_classes = generate_core_courses(30)
+        courses = generate_electives(14) + core_classes
+
+        for z in range(num_runs_before_start):
+            if verbose:
+                print("\n\nsemester {}".format(z))
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+
+
+        #reset metrics
+
+        dropouts = []
+        graduates = []
+        minors = []
+
+        num_dropped_out_for_failed_classes = 0
+        num_dropped_out_for_dropout_rate = 0
+        num_dropped_out_for_too_many_semesters = 0
+
+
+        for z in range(num_semesters):
+            if verbose:
+                print("\n\nsemester {}".format(z))
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+
+        failed_classes = []
+
+        student_ids = []
+        for student in students:
+            student_ids.append(student.student_id)
+            for key in student.classes_failed:
+                for i in range(int(student.classes_failed[key])):
+                    failed_classes.append(key)
+
+        grad_ids = []
+        for graduate in graduates:
+            grad_ids.append(graduate.student_id)
+            for key in graduate.classes_failed:
+                for i in range(int(graduate.classes_failed[key])):
+                    failed_classes.append(key)
+
+        dropout_ids = []
+        for dropout in dropouts:
+            dropout_ids.append(dropout.student_id)
+            for key in dropout.classes_failed:
+                for i in range(int(dropout.classes_failed[key])):
+                    failed_classes.append(key)
+
+        minor_ids = []
+        for minor in minors:
+            minor_ids.append(minor.student_id)
+            for key in minor.classes_failed:
+                for i in range(int(minor.classes_failed[key])):
+                    failed_classes.append(key)
+
+        student_ids.sort()
+        grad_ids.sort()
+        dropout_ids.sort()
+        minor_ids.sort()
+
+        failed_courses_by_all = Counter(failed_classes).most_common
+
+        print("students at end of sim: {}".format(len(student_ids)))
+        print("graduates at end of sim: {}".format(len(grad_ids)))
+        print("dropouts at end of sim: {}".format(len(dropout_ids)))
+        print("minors at the end of sim: {}".format(len(minor_ids)))
+
+        print("graduation rate: {}".format(len(grad_ids)/((len(grad_ids)+len(dropouts)))))
+        print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
+        print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
+
+        print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
+        print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
+        print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
+
+        print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
+
+if __name__ == "__main__":
+
+    if len(sys.argv) <3 or len(sys.argv) > 5:
         print("run with number of terms and number of iterations to run that many terms as an argument")
     else:
 
-        if len(sys.argv) == 4:
-            verbose = True
+        verbose = False
+        if len(sys.argv) == 3:
+            num_runs_before_start = 50
         else:
-            verbose = False
+            num_runs_before_start = int(sys.argv[3])
 
         num_terms = int(sys.argv[1])
         num_iterations = int(sys.argv[2])
 
-
-        for i in range(num_iterations):
-            print("\niteration {}".format(i+1))
-            #set term variables
-
-            electives_bag = []
-            electives_inc = 0
-
-            fall_interest = {}
-            spring_interest = {}
-
-            passfail = True
-            dropouts = []
-            graduates = []
-            student_id_inc = 0
-            minors = []
-
-            num_dropped_out_for_failed_classes = 0
-            num_dropped_out_for_dropout_rate = 0
-            num_dropped_out_for_too_many_semesters = 0
-
-
-            students = []
-            core_classes = generate_core_courses(30)
-            courses = generate_electives(14) + core_classes
-
-            for z in range(num_terms):
-                if verbose:
-                    print("\n\nsemester {}".format(z))
-                students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
-
-            failed_classes = []
-
-            student_ids = []
-            for student in students:
-                student_ids.append(student.student_id)
-                for key in student.classes_failed:
-                    for i in range(int(student.classes_failed[key])):
-                        failed_classes.append(key)
-
-            grad_ids = []
-            for graduate in graduates:
-                grad_ids.append(graduate.student_id)
-                for key in graduate.classes_failed:
-                    for i in range(int(graduate.classes_failed[key])):
-                        failed_classes.append(key)
-
-            dropout_ids = []
-            for dropout in dropouts:
-                dropout_ids.append(dropout.student_id)
-                for key in dropout.classes_failed:
-                    for i in range(int(dropout.classes_failed[key])):
-                        failed_classes.append(key)
-
-            minor_ids = []
-            for minor in minors:
-                minor_ids.append(minor.student_id)
-                for key in minor.classes_failed:
-                    for i in range(int(minor.classes_failed[key])):
-                        failed_classes.append(key)
-
-            student_ids.sort()
-            grad_ids.sort()
-            dropout_ids.sort()
-            minor_ids.sort()
-
-            failed_courses_by_all = Counter(failed_classes).most_common
-
-            print("students at end of sim: {}".format(len(student_ids)))
-            print("graduates at end of sim: {}".format(len(grad_ids)))
-            print("dropouts at end of sim: {}".format(len(dropout_ids)))
-            print("minors at the end of sim: {}".format(len(minor_ids)))
-
-            print("graduation rate: {}".format(len(grad_ids)/((len(grad_ids)+len(dropouts)))))
-            print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
-            print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
-
-            print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
-            print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
-            print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
-
-            print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
+    main_loop(num_terms, num_iterations, num_runs_before_start)
