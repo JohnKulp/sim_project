@@ -57,14 +57,14 @@ def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .1, class_size = 7*40)
-    cs441 = Course(441, difficulty = .05, class_size = 6*40)
-    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 5*40)
-    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 5*40)
-    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 4*40)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 4*40)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 3*40)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*40)
+    cs401 = Course(401, difficulty = -.05, class_size = 7*40)
+    cs441 = Course(441, difficulty = -.1, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = -.03, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .01, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .03, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .05, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = -.04, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .06, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -88,7 +88,7 @@ def generate_electives(number_of_electives):
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
             requirement = [445] if random.random() < .2 else [1501]
-            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = 0, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -105,7 +105,10 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .5))
+        skill = st.norm.rvs(loc = .84, scale = .15)
+        skill = 1.0 if skill > 1.0 else skill
+        skill = 0.0 if skill < 0.0 else skill
+        students.append(Student(skill_level = skill, student_id = student_id_inc, is_minor = random.random() > .5))
         student_id_inc +=1
 
     return students
@@ -170,16 +173,18 @@ def update_students_with_new_grades(term):
             print("at the end of the semester, course {} had {} students out of {}".format(
                 course.course_id, len(course.students), course.class_size))
         for student in course.students:
-            grade = assign_grade_to_student(course.difficulty, passfail)
+            grade = assign_grade_to_student(student.skill_level, course.difficulty, passfail)
             student.add_course_grade(course.course_id,grade)
 
 
-def assign_grade_to_student(difficulty, passfail = True):
+def assign_grade_to_student(skill_level, difficulty, passfail = True):
     if passfail:
-        return 1.0 if random.random() >= (difficulty) else 0.0
+        return 1.0 if st.norm.rvs(loc = skill_level - difficulty, scale = .15) >= .6 else 0.0
     else:
-        grade = random.random()
-        return grade if grade >= 1 - difficulty else 0.0
+        grade = st.norm.rvs(loc = skill_level - difficulty, scale = .15)
+        grade = 1.0 if grade > 1.0 else grade
+        grade = 0.0 if grade < 0.0 else grade
+        return grade
 
 
 # term is a list of courses for the semester
@@ -235,7 +240,7 @@ def populate_courses_with_students(term,students):
     students.sort(key = lambda x: len(x.course_transcript), reverse=True)
     for student in students:
         courses_taken=[]
-        max_courses = 2 + (1 if random.random() < student.skill_level else 0)
+        max_courses = 2 + (1 if st.norm.rvs() + st.norm.ppf(.8) < student.skill_level else 0)
         #try to retake courses the student plans to retake first
         for course_id in student.plan_to_retake:
             if course_id <= 400:
@@ -441,6 +446,7 @@ if __name__ == "__main__":
             print("dropouts at end of sim: {}".format(len(dropout_ids)))
             print("minors at the end of sim: {}".format(len(minor_ids)))
 
+            print("graduation rate: {}".format(len(grad_ids)/((len(grad_ids)+len(dropouts)))))
             print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
             print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
 
