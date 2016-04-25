@@ -300,8 +300,11 @@ def get_average_time_in_system(student_list):
 def get_average_classes_failed(student_list):
     total_failed=0
     average_failed=0
+    
     for student in student_list:
-        total_failed+=len(student.classes_failed)
+        for key in student.classes_failed:
+            total_failed += int(student.classes_failed[key])
+
     if total_failed!=0:
         average_failed=float(total_failed)/len(student_list)     
     return average_failed

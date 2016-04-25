@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from Student import *
 from Faculty import *
 from Course import *
@@ -385,3 +386,5 @@ if __name__ == "__main__":
             text_file.write("%d %d %d %d %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
 
         text_file.close()
+=======
+>>>>>>> 737c2bed85a835f30932f596b7f10f50ea3a0ab6

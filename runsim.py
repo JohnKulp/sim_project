@@ -2,6 +2,7 @@ from Student import *
 from Faculty import *
 from Course import *
 
+from collections import Counter
 import operator
 import random
 import scipy.stats as st
@@ -56,14 +57,14 @@ def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .1, class_size = 7*40)
-    cs441 = Course(441, difficulty = .05, class_size = 6*40)
-    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 5*40)
-    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 5*40)
-    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 4*40)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 4*40)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 3*40)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*40)
+    cs401 = Course(401, difficulty = -.05, class_size = 7*40)
+    cs441 = Course(441, difficulty = -.1, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = -.03, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .01, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .03, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .05, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = -.04, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .06, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -87,7 +88,7 @@ def generate_electives(number_of_electives):
         #add new electives
         for i in range(number_of_electives - len(electives_bag)):
             requirement = [445] if random.random() < .2 else [1501]
-            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = .15, class_size = 40))
+            electives_bag.append(Course(i, requirements = requirement, is_core = False, difficulty = 0, class_size = 40))
             electives_inc += 1
 
     #pick from a deep copy of the bag
@@ -104,7 +105,10 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .8))
+        skill = st.norm.rvs(loc = .84, scale = .15)
+        skill = 1.0 if skill > 1.0 else skill
+        skill = 0.0 if skill < 0.0 else skill
+        students.append(Student(skill_level = skill, student_id = student_id_inc, is_minor = random.random() > .5))
         student_id_inc +=1
 
     return students
@@ -169,16 +173,18 @@ def update_students_with_new_grades(term):
             print("at the end of the semester, course {} had {} students out of {}".format(
                 course.course_id, len(course.students), course.class_size))
         for student in course.students:
-            grade = assign_grade_to_student(course.difficulty, passfail)
+            grade = assign_grade_to_student(student.skill_level, course.difficulty, passfail)
             student.add_course_grade(course.course_id,grade)
 
 
-def assign_grade_to_student(difficulty, passfail = True):
+def assign_grade_to_student(skill_level, difficulty, passfail = True):
     if passfail:
-        return 1.0 if random.random() >= (difficulty) else 0.0
+        return 1.0 if st.norm.rvs(loc = skill_level - difficulty, scale = .15) >= .6 else 0.0
     else:
-        grade = random.random()
-        return grade if grade >= 1 - difficulty else 0.0
+        grade = st.norm.rvs(loc = skill_level - difficulty, scale = .15)
+        grade = 1.0 if grade > 1.0 else grade
+        grade = 0.0 if grade < 0.0 else grade
+        return grade
 
 
 # term is a list of courses for the semester
@@ -234,7 +240,7 @@ def populate_courses_with_students(term,students):
     students.sort(key = lambda x: len(x.course_transcript), reverse=True)
     for student in students:
         courses_taken=[]
-        max_courses = 2 + (1 if random.random() < student.skill_level else 0)
+        max_courses = 2 + (1 if st.norm.rvs() + st.norm.ppf(.8) < student.skill_level else 0)
         #try to retake courses the student plans to retake first
         for course_id in student.plan_to_retake:
             if course_id <= 400:
@@ -303,7 +309,6 @@ def runloop(students, term, num_incoming, is_fall):
 
     calculate_class_sizes(is_fall, 40)
 
-    courses.sort(key=lambda x: x.course_id)
     remove_students_from_courses(term)
     for student in students:
         student.semesters_completed +=1
@@ -311,8 +316,32 @@ def runloop(students, term, num_incoming, is_fall):
 
     return students
 
+#takes the number of semester from graduates and returns an average
+def get_average_time_in_system(student_list):
+    total_semesters=0
+    average_semester=0
+    for student in student_list:
+        total_semesters+=student.semesters_completed
+    if total_semesters!=0:
+        average_semester=float(total_semesters)/len(student_list)        
+    return average_semester
 
-if __name__ == "__main__":
+
+#takes number of classes failed from graduates and returns an average
+def get_average_classes_failed(student_list):
+    total_failed=0
+    average_failed=0
+    
+    for student in student_list:
+        for key in student.classes_failed:
+            total_failed += int(student.classes_failed[key])
+
+    if total_failed!=0:
+        average_failed=float(total_failed)/len(student_list)     
+    return average_failed
+
+
+def main_loop(num_semesters, num_iterations, num_runs_before_start):
 
     global passfail
     global dropouts
@@ -332,77 +361,117 @@ if __name__ == "__main__":
     global electives_inc
 
 
-    if len(sys.argv) <3 or len(sys.argv) > 4:
+    for i in range(num_iterations):
+        print("\niteration {}".format(i+1))
+        #set term variables
+        electives_bag = []
+        electives_inc = 0
+
+        fall_interest = {}
+        spring_interest = {}
+
+        passfail = True
+        dropouts = []
+        graduates = []
+        student_id_inc = 0
+        minors = []
+
+        num_dropped_out_for_failed_classes = 0
+        num_dropped_out_for_dropout_rate = 0
+        num_dropped_out_for_too_many_semesters = 0
+
+
+        students = []
+        core_classes = generate_core_courses(30)
+        courses = generate_electives(14) + core_classes
+
+        for z in range(num_runs_before_start):
+            if verbose:
+                print("\n\nsemester {}".format(z))
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+
+
+        #reset metrics
+
+        dropouts = []
+        graduates = []
+        minors = []
+
+        num_dropped_out_for_failed_classes = 0
+        num_dropped_out_for_dropout_rate = 0
+        num_dropped_out_for_too_many_semesters = 0
+
+
+        for z in range(num_semesters):
+            if verbose:
+                print("\n\nsemester {}".format(z))
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+
+        failed_classes = []
+
+        student_ids = []
+        for student in students:
+            student_ids.append(student.student_id)
+            for key in student.classes_failed:
+                for i in range(int(student.classes_failed[key])):
+                    failed_classes.append(key)
+
+        grad_ids = []
+        for graduate in graduates:
+            grad_ids.append(graduate.student_id)
+            for key in graduate.classes_failed:
+                for i in range(int(graduate.classes_failed[key])):
+                    failed_classes.append(key)
+
+        dropout_ids = []
+        for dropout in dropouts:
+            dropout_ids.append(dropout.student_id)
+            for key in dropout.classes_failed:
+                for i in range(int(dropout.classes_failed[key])):
+                    failed_classes.append(key)
+
+        minor_ids = []
+        for minor in minors:
+            minor_ids.append(minor.student_id)
+            for key in minor.classes_failed:
+                for i in range(int(minor.classes_failed[key])):
+                    failed_classes.append(key)
+
+        student_ids.sort()
+        grad_ids.sort()
+        dropout_ids.sort()
+        minor_ids.sort()
+
+        failed_courses_by_all = Counter(failed_classes).most_common
+
+        print("students at end of sim: {}".format(len(student_ids)))
+        print("graduates at end of sim: {}".format(len(grad_ids)))
+        print("dropouts at end of sim: {}".format(len(dropout_ids)))
+        print("minors at the end of sim: {}".format(len(minor_ids)))
+
+        print("graduation rate: {}".format(len(grad_ids)/((len(grad_ids)+len(dropouts)))))
+        print("average time a graduate is in the system {}".format(get_average_time_in_system(graduates)))
+        print("average graduate classes failed {}".format(get_average_classes_failed(graduates)))
+
+        print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
+        print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
+        print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
+
+        print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
+
+if __name__ == "__main__":
+
+    if len(sys.argv) <3 or len(sys.argv) > 5:
         print("run with number of terms and number of iterations to run that many terms as an argument")
     else:
 
-        if len(sys.argv) == 4:
-            verbose = True
+        verbose = False
+        if len(sys.argv) == 3:
+            num_runs_before_start = 50
         else:
-            verbose = False
+            num_runs_before_start = int(sys.argv[3])
 
         num_terms = int(sys.argv[1])
         num_iterations = int(sys.argv[2])
 
-
-        for i in range(num_iterations):
-            print("\niteration {}".format(i+1))
-            #set term variables
-
-            electives_bag = []
-            electives_inc = 0
-
-            fall_interest = {}
-            spring_interest = {}
-
-            passfail = True
-            dropouts = []
-            graduates = []
-            student_id_inc = 0
-            minors = []
-
-            num_dropped_out_for_failed_classes = 0
-            num_dropped_out_for_dropout_rate = 0
-            num_dropped_out_for_too_many_semesters = 0
-
-
-            students = []
-            core_classes = generate_core_courses(30)
-            courses = generate_electives(14) + core_classes
-
-            for z in range(num_terms):
-                if verbose:
-                    print("\n\nsemester {}".format(z))
-                students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
-
-            student_ids = []
-            for student in students:
-                student_ids.append(student.student_id)
-
-            grad_ids = []
-            for graduate in graduates:
-                grad_ids.append(graduate.student_id)
-
-            dropout_ids = []
-            for dropout in dropouts:
-                dropout_ids.append(dropout.student_id)
-
-            minor_ids = []
-            for minor in minors:
-                minor_ids.append(minor.student_id)
-
-            student_ids.sort()
-            grad_ids.sort()
-            dropout_ids.sort()
-            minor_ids.sort()
-
-            print("students at end of sim: {}".format(len(student_ids)))
-            print("graduates at end of sim: {}".format(len(grad_ids)))
-            print("dropouts at end of sim: {}".format(len(dropout_ids)))
-            print("minors at the end of sim: {}".format(len(minor_ids)))
-
-            print("number dropped out for failing classes: {}".format(num_dropped_out_for_failed_classes))
-            print("number naturally droppout out: {}".format(num_dropped_out_for_dropout_rate))
-            print("number dropped out for being in system too long: {}".format(num_dropped_out_for_too_many_semesters))
-
-
+    main_loop(num_terms, num_iterations, num_runs_before_start)
