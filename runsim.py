@@ -105,7 +105,7 @@ def generate_students(num_to_generate):
     students = []
 
     for i in range(num_to_generate):
-        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .8))
+        students.append(Student(skill_level = random.random(), student_id = student_id_inc, is_minor = random.random() > .5))
         student_id_inc +=1
 
     return students
