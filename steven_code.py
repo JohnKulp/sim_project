@@ -57,14 +57,14 @@ def generate_core_courses(num_core):
 
     courses = []
 
-    cs401 = Course(401, difficulty = .1, class_size = 7*40)
-    cs441 = Course(441, difficulty = .05, class_size = 6*40)
-    cs445 = Course(445, requirements=[401], difficulty = .15, class_size = 5*40)
-    cs447 = Course(447, requirements=[445], difficulty = .15, class_size = 5*40)
-    cs449 = Course(449, requirements=[447], difficulty = .1, class_size = 4*40)
-    cs1501 = Course(1501, requirements=[401, 445], difficulty = .2, class_size = 4*40)
-    cs1502 = Course(1502, requirements=[441, 445], difficulty = .1, class_size = 3*40)
-    cs1550 = Course(1550, requirements=[447, 449], difficulty = .25, class_size = 2*40)
+    cs401 = Course(401, difficulty = -.05, class_size = 7*40)
+    cs441 = Course(441, difficulty = -.1, class_size = 6*40)
+    cs445 = Course(445, requirements=[401], difficulty = -.03, class_size = 5*40)
+    cs447 = Course(447, requirements=[445], difficulty = .01, class_size = 5*40)
+    cs449 = Course(449, requirements=[447], difficulty = .03, class_size = 4*40)
+    cs1501 = Course(1501, requirements=[401, 445], difficulty = .05, class_size = 4*40)
+    cs1502 = Course(1502, requirements=[441, 445], difficulty = -.04, class_size = 3*40)
+    cs1550 = Course(1550, requirements=[447, 449], difficulty = .06, class_size = 2*40)
 
     courses.append(cs401)
     courses.append(cs441)
@@ -467,7 +467,7 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
 
         print("Most commonly failed courses by Frequency: {}".format(failed_courses_by_all))
 
-        stats_output.write("%d %d %d %d %.3f %.3f %d %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), grad_rate, avg_time, avg_classes_failed, num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
+        stats_output.write("%d %d %d %d %.2f %.2f %.2f %d %d %d\n" % (len(student_ids), len(grad_ids), len(dropout_ids), len(minor_ids), grad_rate, avg_time, avg_classes_failed, num_dropped_out_for_failed_classes, num_dropped_out_for_dropout_rate, num_dropped_out_for_too_many_semesters))
         for value, count in failed_courses_by_all:
             course_fail_freq.write("%d : %d " % (value, count))
         course_fail_freq.write("\n")

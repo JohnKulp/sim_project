@@ -3,4 +3,4 @@ Iterations: 50
 
 CurrStudents Grads Drops Mins GradRate AvgGradTime AvgGradClassFailed NumDropOuts_Failed NumDropOuts_Natural NumDropOuts_Time
 
-1273 42520 13290 50126 0.762 10.569 1 4379 6145 2829
+852 38506 22710 44994 0.63 6.03 3.66 13564 4616 4796
