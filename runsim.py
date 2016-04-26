@@ -99,7 +99,7 @@ def generate_electives(number_of_electives):
         courses.append(bag_copy.pop())
     return courses
 
-def generate_students(num_to_generate):
+def generate_students(num_to_generate, minor_rate):
     global student_id_inc
     
     students = []
@@ -108,7 +108,7 @@ def generate_students(num_to_generate):
         skill = st.norm.rvs(loc = .84, scale = .15)
         skill = 1.0 if skill > 1.0 else skill
         skill = 0.0 if skill < 0.0 else skill
-        students.append(Student(skill_level = skill, student_id = student_id_inc, is_minor = random.random() > .5))
+        students.append(Student(skill_level = skill, student_id = student_id_inc, is_minor = random.random() > 1-minor_rate))
         student_id_inc +=1
 
     return students
@@ -285,12 +285,12 @@ def populate_courses_with_students(term,students):
                 course.students.append(student)
 
 
-def runloop(students, term, num_incoming, is_fall):
+def runloop(students, term, num_incoming, is_fall, minor_rate):
     global verbose
 
     set_class_sizes(is_fall)
 
-    new_students = generate_students(num_incoming)
+    new_students = generate_students(num_incoming, minor_rate)
 
     #this causes a deep change in the object instead of changing list pointer
     number_new = len(new_students)
@@ -341,7 +341,7 @@ def get_average_classes_failed(student_list):
     return average_failed
 
 
-def main_loop(num_semesters, num_iterations, num_runs_before_start):
+def main_loop(num_semesters, num_iterations, num_runs_before_start, minor_rate):
 
     global passfail
     global dropouts
@@ -397,7 +397,7 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
         for z in range(num_runs_before_start):
             if verbose:
                 print("\n\nsemester {}".format(z))
-            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0, minor_rate)
 
 
         #reset metrics
@@ -414,7 +414,7 @@ def main_loop(num_semesters, num_iterations, num_runs_before_start):
         for z in range(num_semesters):
             if verbose:
                 print("\n\nsemester {}".format(z))
-            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0)
+            students = runloop(students, courses, (275 if z % 2 == 0 else 150), z%2 == 0, minor_rate)
 
         failed_classes = []
 
@@ -496,4 +496,9 @@ if __name__ == "__main__":
         num_terms = int(sys.argv[1])
         num_iterations = int(sys.argv[2])
 
-    main_loop(num_terms, num_iterations, num_runs_before_start)
+
+    #i = .45
+    #while i < .56:
+    #    print("running the sim with a minor rate of {}".format(i))
+        main_loop(num_terms, num_iterations, num_runs_before_start, 50)#i)
+    #    i+=.01
