@@ -1,5 +1,5 @@
-# Computer Science Department Simulation
-## By, John Kulp, Alec Jasen, Steven Roomberg, and Malek Ameli-grillon
+## Computer Science Department Simulation
+### By John Kulp, Alec Jasen, Steven Roomberg, and Malek Ameli-grillon
 
 =====
 
@@ -13,9 +13,9 @@ You must have a working installation of Python 3 along with the libraries Numpy,
 
 To run the simulation, enter
 
-'''
+```
 python runsim.py <number_of_terms> <number_of_iterations> <number_of_terms_to_use_to_generate_list_of_students>
-'''
+```
 
 <number_of_terms> is the number of terms to run the simulation for
 
