@@ -500,5 +500,5 @@ if __name__ == "__main__":
     #i = .45
     #while i < .56:
     #    print("running the sim with a minor rate of {}".format(i))
-        main_loop(num_terms, num_iterations, num_runs_before_start, 50)#i)
+    main_loop(num_terms, num_iterations, num_runs_before_start, .5)#i)
     #    i+=.01
