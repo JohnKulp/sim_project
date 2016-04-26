@@ -1,5 +1,5 @@
 ## Computer Science Department Simulation
-### By John Kulp, Alec Jasen, Steven Roomberg, and Malek Ameli-grillon
+By John Kulp, Alec Jasen, Steven Roomberg, and Malek Ameli-grillon
 
 =====
 
